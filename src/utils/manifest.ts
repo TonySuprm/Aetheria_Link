@@ -22,7 +22,7 @@ export const buildManifest = (sources: Source[], extractors: Extractor[], config
     id: envGetAppId(),
     version: '0.73.2', // x-release-please-version
     name: `${envGetAppName()}${getDebridSuffix(config)}`,
-    description: 'Provides HTTP URLs from streaming websites. Configure add-on for additional languages. Add MediaFlow proxy for more URLs.',
+    description: 'Resolves streaming sites into URLs',
     resources: [
       'stream',
     ],
@@ -62,10 +62,8 @@ export const buildManifest = (sources: Source[], extractors: Extractor[], config
       return countryCodeA.localeCompare(countryCodeB);
     });
 
-  const languages: string[] = [];
   for (const [countryCode, sources] of sortedLanguageSources) {
     const language = languageFromCountryCode(countryCode);
-    languages.push(language);
 
     const isDefaultAsian = [CountryCode.multi, CountryCode.ja, CountryCode.zh, CountryCode.ko].includes(countryCode as CountryCode);
     manifest.config.push({
@@ -148,9 +146,6 @@ export const buildManifest = (sources: Source[], extractors: Extractor[], config
       ...(isSourceDisabled(config, source) && { default: 'checked' }),
     });
   });
-
-  manifest.description += `\n\nSupported languages: ${languages.filter(language => language !== 'Multi').join(', ')}`;
-  manifest.description += `\n\nSupported extractors: ${extractors.map(extractor => extractor.label).join(', ')}`;
 
   return manifest;
 };

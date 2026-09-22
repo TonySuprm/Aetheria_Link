@@ -333,11 +333,7 @@ exports[`buildManifest default manifest 1`] = `
       "type": "checkbox",
     },
   ],
-  "description": "Provides HTTP URLs from streaming websites. Configure add-on for additional languages. Add MediaFlow proxy for more URLs.
-
-Supported languages: English, Gujarati, Hindi, Indonesian, Japanese, Korean, Malayalam, Punjabi, Russian, Tamil, Telugu, Thai, Chinese
-
-Supported extractors: ",
+  "description": "Resolves streaming sites into URLs",
   "id": "aethlink",
   "idPrefixes": [
     "tmdb:",
