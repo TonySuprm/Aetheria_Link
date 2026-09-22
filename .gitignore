@@ -8,7 +8,6 @@ beamup-host.json
 # Sidecar binaries and external repositories (must be set up separately)
 /skip-redirect/
 /browser-extension/
-/mediaflow-proxy/
 
 # Runtime logs
 *.log

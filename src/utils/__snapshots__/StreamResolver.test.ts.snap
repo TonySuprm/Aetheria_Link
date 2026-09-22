@@ -11,7 +11,7 @@ exports[`handles source throwing non-NotFoundError 2`] = `
   "streams": [
     {
       "externalUrl": "https://example.com",
-      "name": "Aetheria Link",
+      "name": "AethLink",
       "title": "🔗 ThrowingSource
 ❌ Request failed. Request-id: test.",
     },
@@ -27,7 +27,7 @@ exports[`resolve adds error info 1`] = `
         "bingeGroup": "aetheria-link-undefined-undefined-de",
         "notWebReady": true,
       },
-      "name": "Aetheria Link
+      "name": "AethLink
 🇩🇪",
       "title": "🔗 working1",
       "url": "https://example6.com/",
@@ -37,7 +37,7 @@ exports[`resolve adds error info 1`] = `
         "bingeGroup": "aetheria-link-undefined-undefined-de",
         "notWebReady": true,
       },
-      "name": "Aetheria Link
+      "name": "AethLink
 🇩🇪",
       "title": "🔗 working2",
       "url": "https://example9.com/",
@@ -48,7 +48,7 @@ exports[`resolve adds error info 1`] = `
         "notWebReady": true,
       },
       "externalUrl": "https://example1.com/",
-      "name": "Aetheria Link
+      "name": "AethLink
 🇩🇪",
       "title": "🔗 hoster.com",
     },
@@ -66,7 +66,7 @@ exports[`resolve adds error info 2`] = `
         "notWebReady": true,
       },
       "externalUrl": "https://example14.com/",
-      "name": "Aetheria Link
+      "name": "AethLink
 🇩🇪",
       "title": "🔗 hoster.com
 ❌ Request to example14.com failed with status 418 (I'm a tea pot). Request-id: test.",
@@ -77,7 +77,7 @@ exports[`resolve adds error info 2`] = `
         "notWebReady": true,
       },
       "externalUrl": "https://example13.com/",
-      "name": "Aetheria Link
+      "name": "AethLink
 🇩🇪",
       "title": "🔗 hoster.com
 ❌ Remote server example13.com has issues. We can't fix this, please try later again.",
@@ -88,7 +88,7 @@ exports[`resolve adds error info 2`] = `
         "notWebReady": true,
       },
       "externalUrl": "https://example12.com/",
-      "name": "Aetheria Link
+      "name": "AethLink
 🇩🇪",
       "title": "🔗 hoster.com
 ⏳ Request queue for example12.com is full. Please try again later or consider self-hosting.",
@@ -99,7 +99,7 @@ exports[`resolve adds error info 2`] = `
         "notWebReady": true,
       },
       "externalUrl": "https://example11.com/",
-      "name": "Aetheria Link
+      "name": "AethLink
 🇩🇪",
       "title": "🔗 hoster.com
 🐢 Request to example11.com timed out.",
@@ -110,7 +110,7 @@ exports[`resolve adds error info 2`] = `
         "notWebReady": true,
       },
       "externalUrl": "https://example10.com/",
-      "name": "Aetheria Link
+      "name": "AethLink
 🇩🇪",
       "title": "🔗 hoster.com
 ❌ Request failed. Request-id: test.",
@@ -121,7 +121,7 @@ exports[`resolve adds error info 2`] = `
         "notWebReady": true,
       },
       "externalUrl": "https://example8.com/",
-      "name": "Aetheria Link
+      "name": "AethLink
 🇩🇪",
       "title": "🔗 hoster.com
 🚦 Too many recent timeouts when requesting example8.com. Please try again later.",
@@ -132,7 +132,7 @@ exports[`resolve adds error info 2`] = `
         "notWebReady": true,
       },
       "externalUrl": "https://example7.com/",
-      "name": "Aetheria Link
+      "name": "AethLink
 🇩🇪",
       "title": "🔗 hoster.com
 🚦 Request to example7.com was rate-limited. Please try again later or consider self-hosting.",
@@ -143,7 +143,7 @@ exports[`resolve adds error info 2`] = `
         "notWebReady": true,
       },
       "externalUrl": "https://example5.com/",
-      "name": "Aetheria Link
+      "name": "AethLink
 🇩🇪",
       "title": "🔗 hoster.com
 ⚠️ Request to example5.com was blocked. Reason: unknown",
@@ -154,7 +154,7 @@ exports[`resolve adds error info 2`] = `
         "notWebReady": true,
       },
       "externalUrl": "https://example4.com/",
-      "name": "Aetheria Link
+      "name": "AethLink
 🇩🇪",
       "title": "🔗 hoster.com
 ⚠️ MediaFlow Proxy authentication failed. Please set the correct password.",
@@ -165,7 +165,7 @@ exports[`resolve adds error info 2`] = `
         "notWebReady": true,
       },
       "externalUrl": "https://example3.com/",
-      "name": "Aetheria Link
+      "name": "AethLink
 🇩🇪",
       "title": "🔗 hoster.com
 ⚠️ Request to example3.com was blocked. Reason: cloudflare_censor",
@@ -176,7 +176,7 @@ exports[`resolve adds error info 2`] = `
         "notWebReady": true,
       },
       "externalUrl": "https://example2.com/",
-      "name": "Aetheria Link
+      "name": "AethLink
 🇩🇪",
       "title": "🔗 hoster.com
 ⚠️ Request to example2.com was blocked. Reason: cloudflare_challenge",
@@ -186,7 +186,7 @@ exports[`resolve adds error info 2`] = `
         "bingeGroup": "aetheria-link-undefined-undefined-de",
         "notWebReady": true,
       },
-      "name": "Aetheria Link
+      "name": "AethLink
 🇩🇪",
       "title": "🔗 working1",
       "url": "https://example6.com/",
@@ -196,7 +196,7 @@ exports[`resolve adds error info 2`] = `
         "bingeGroup": "aetheria-link-undefined-undefined-de",
         "notWebReady": true,
       },
-      "name": "Aetheria Link
+      "name": "AethLink
 🇩🇪",
       "title": "🔗 working2",
       "url": "https://example9.com/",
@@ -207,7 +207,7 @@ exports[`resolve adds error info 2`] = `
         "notWebReady": true,
       },
       "externalUrl": "https://example1.com/",
-      "name": "Aetheria Link
+      "name": "AethLink
 🇩🇪",
       "title": "🔗 hoster.com",
     },
@@ -230,7 +230,7 @@ exports[`resolve keeps fallback sources if needed 1`] = `
       "bingeGroup": "aetheria-link-fallback-only-undefined-multi",
       "notWebReady": true,
     },
-    "name": "Aetheria Link
+    "name": "AethLink
 🌐",
     "title": "🔗 HubCloud from FallbackOnly",
     "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubcloud.cx%2Fsome-link",
@@ -277,7 +277,7 @@ exports[`resolve returns sorted results 1`] = `
       },
       "videoSize": 1395864371,
     },
-    "name": "Aetheria Link
+    "name": "AethLink
 🇩🇪
 1080p",
     "title": "des-teufels-bad-2024
@@ -296,7 +296,7 @@ exports[`resolve returns sorted results 1`] = `
       },
       "videoSize": 1181116006,
     },
-    "name": "Aetheria Link
+    "name": "AethLink
 🇮🇹
 720p",
     "title": "the-devils-bath-2024-sd-sub-ita
@@ -314,7 +314,7 @@ exports[`resolve returns sorted results 1`] = `
         },
       },
     },
-    "name": "Aetheria Link
+    "name": "AethLink
 🇩🇪",
     "title": "🔗 Mixdrop from MeineCloud",
     "url": "http://localhost/%7B%22de%22%3A%22on%22%2C%22it%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fmixdrop.ag%2Fe%2F3nzwveprim63or6",
@@ -329,7 +329,7 @@ exports[`resolve returns sorted results 1`] = `
         },
       },
     },
-    "name": "Aetheria Link
+    "name": "AethLink
 🇮🇹",
     "title": "🔗 Mixdrop from MostraGuarda",
     "url": "http://localhost/%7B%22de%22%3A%22on%22%2C%22it%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fmixdrop.ag%2Fe%2Fvk196d6xfzwwo1",
@@ -350,7 +350,7 @@ exports[`resolve returns sorted results 2`] = `
       },
       "videoSize": 1395864371,
     },
-    "name": "Aetheria Link
+    "name": "AethLink
 🇩🇪
 1080p",
     "title": "des-teufels-bad-2024
@@ -369,7 +369,7 @@ exports[`resolve returns sorted results 2`] = `
       },
       "videoSize": 1181116006,
     },
-    "name": "Aetheria Link
+    "name": "AethLink
 🇮🇹
 720p",
     "title": "the-devils-bath-2024-sd-sub-ita
@@ -387,7 +387,7 @@ exports[`resolve returns sorted results 2`] = `
         },
       },
     },
-    "name": "Aetheria Link
+    "name": "AethLink
 🇩🇪",
     "title": "🔗 Mixdrop from MeineCloud",
     "url": "http://localhost/%7B%22de%22%3A%22on%22%2C%22it%22%3A%22on%22%2C%22includeExternalUrls%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fmixdrop.ag%2Fe%2F3nzwveprim63or6",
@@ -402,7 +402,7 @@ exports[`resolve returns sorted results 2`] = `
         },
       },
     },
-    "name": "Aetheria Link
+    "name": "AethLink
 🇮🇹",
     "title": "🔗 Mixdrop from MostraGuarda",
     "url": "http://localhost/%7B%22de%22%3A%22on%22%2C%22it%22%3A%22on%22%2C%22includeExternalUrls%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fmixdrop.ag%2Fe%2Fvk196d6xfzwwo1",
@@ -418,7 +418,7 @@ exports[`resolve returns sorted results 2`] = `
       },
     },
     "externalUrl": "https://supervideo.cc/e/q7i0sw1oytw3",
-    "name": "Aetheria Link
+    "name": "AethLink
 🇩🇪
 ⚠️ external",
     "title": "🔗 supervideo.cc from MeineCloud",
@@ -434,7 +434,7 @@ exports[`resolve returns sorted results 2`] = `
       },
     },
     "externalUrl": "https://supervideo.cc/e/6vri8jyhla3n",
-    "name": "Aetheria Link
+    "name": "AethLink
 🇮🇹
 ⚠️ external",
     "title": "🔗 supervideo.cc from MostraGuarda",
@@ -464,21 +464,7 @@ exports[`resolve skips fallback sources if possible 1`] = `
       "notWebReady": true,
       "videoSize": 22430466703,
     },
-    "name": "Aetheria Link
-🌐 🇺🇸 🇮🇳
-2160p",
-    "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.2160p.NF.WEB-DL.DUAL.DDP5.1.Atmos.DV.HDR.H.265-4kHDHub.Com.mkv
-💾 20.89 GB
-🔗 HubCloud from 4KHDHub",
-    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubcloud.foo%2Fdrive%2Ftskphjtms4ovpkl",
-  },
-  {
-    "behaviorHints": {
-      "bingeGroup": "aetheria-link-4khdhub-undefined-multi_en_hi",
-      "notWebReady": true,
-      "videoSize": 22430466703,
-    },
-    "name": "Aetheria Link
+    "name": "AethLink
 🌐 🇺🇸 🇮🇳
 2160p",
     "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.2160p.NF.WEB-DL.DUAL.DDP5.1.Atmos.DV.HDR.H.265-4kHDHub.Com.mkv
@@ -492,21 +478,7 @@ exports[`resolve skips fallback sources if possible 1`] = `
       "notWebReady": true,
       "videoSize": 19295140577,
     },
-    "name": "Aetheria Link
-🌐 🇺🇸 🇮🇳
-2160p",
-    "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.2160p.NF.WEB-DL.DUAL.DDP5.1.Atmos.H.265-4kHDHub.Com.mkv
-💾 17.97 GB
-🔗 HubCloud from 4KHDHub",
-    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubcloud.foo%2Fdrive%2Fa55vjuuwj4vbtha",
-  },
-  {
-    "behaviorHints": {
-      "bingeGroup": "aetheria-link-4khdhub-undefined-multi_en_hi",
-      "notWebReady": true,
-      "videoSize": 19295140577,
-    },
-    "name": "Aetheria Link
+    "name": "AethLink
 🌐 🇺🇸 🇮🇳
 2160p",
     "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.2160p.NF.WEB-DL.DUAL.DDP5.1.Atmos.H.265-4kHDHub.Com.mkv
@@ -520,21 +492,7 @@ exports[`resolve skips fallback sources if possible 1`] = `
       "notWebReady": true,
       "videoSize": 10018011217,
     },
-    "name": "Aetheria Link
-🌐 🇺🇸 🇮🇳
-1080p",
-    "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.1080p.NF.WEB-DL.Hindi.DDP5.1.Atmos-English.DDP5.1.Atmos.H.265-4kHdHub.Com.mkv
-💾 9.33 GB
-🔗 HubCloud from 4KHDHub",
-    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubcloud.foo%2Fdrive%2F4bttg4jurgo151w",
-  },
-  {
-    "behaviorHints": {
-      "bingeGroup": "aetheria-link-4khdhub-undefined-multi_en_hi",
-      "notWebReady": true,
-      "videoSize": 10018011217,
-    },
-    "name": "Aetheria Link
+    "name": "AethLink
 🌐 🇺🇸 🇮🇳
 1080p",
     "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.1080p.NF.WEB-DL.Hindi.DDP5.1.Atmos-English.DDP5.1.Atmos.H.265-4kHdHub.Com.mkv
@@ -548,21 +506,7 @@ exports[`resolve skips fallback sources if possible 1`] = `
       "notWebReady": true,
       "videoSize": 9985798963,
     },
-    "name": "Aetheria Link
-🌐 🇺🇸 🇮🇳
-1080p",
-    "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.1080p.NF.WEB-DL.Hindi.DDP5.1.Atmos-English.DDP5.1.Atmos.H.264-4kHdHub.Com.mkv
-💾 9.3 GB
-🔗 HubCloud from 4KHDHub",
-    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubcloud.foo%2Fdrive%2Fxoun4ifeynizfs9",
-  },
-  {
-    "behaviorHints": {
-      "bingeGroup": "aetheria-link-4khdhub-undefined-multi_en_hi",
-      "notWebReady": true,
-      "videoSize": 9985798963,
-    },
-    "name": "Aetheria Link
+    "name": "AethLink
 🌐 🇺🇸 🇮🇳
 1080p",
     "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.1080p.NF.WEB-DL.Hindi.DDP5.1.Atmos-English.DDP5.1.Atmos.H.264-4kHdHub.Com.mkv
@@ -576,21 +520,7 @@ exports[`resolve skips fallback sources if possible 1`] = `
       "notWebReady": true,
       "videoSize": 5712306503,
     },
-    "name": "Aetheria Link
-🌐 🇺🇸 🇮🇳
-1080p",
-    "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.1080p.NF.WEB-DL.Hindi.DDP5.1.Atmos-English.DDP5.1.Atmos.HDR-DV.H.265-4kHdHub.Com.mkv
-💾 5.32 GB
-🔗 HubCloud from 4KHDHub",
-    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubcloud.foo%2Fdrive%2F6w6tm1hfcsmshwk",
-  },
-  {
-    "behaviorHints": {
-      "bingeGroup": "aetheria-link-4khdhub-undefined-multi_en_hi",
-      "notWebReady": true,
-      "videoSize": 5712306503,
-    },
-    "name": "Aetheria Link
+    "name": "AethLink
 🌐 🇺🇸 🇮🇳
 1080p",
     "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.1080p.NF.WEB-DL.Hindi.DDP5.1.Atmos-English.DDP5.1.Atmos.HDR-DV.H.265-4kHdHub.Com.mkv
@@ -604,21 +534,7 @@ exports[`resolve skips fallback sources if possible 1`] = `
       "notWebReady": true,
       "videoSize": 1374389534,
     },
-    "name": "Aetheria Link
-🌐 🇺🇸 🇮🇳
-1080p",
-    "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.1080p.NF.WEB-DL.Hindi.AAC5.1-English.AAC5.1.AV1-4kHdHub.Com.mkv
-💾 1.28 GB
-🔗 HubCloud from 4KHDHub",
-    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubcloud.foo%2Fdrive%2Fmvsevbmwskarnmy",
-  },
-  {
-    "behaviorHints": {
-      "bingeGroup": "aetheria-link-4khdhub-undefined-multi_en_hi",
-      "notWebReady": true,
-      "videoSize": 1374389534,
-    },
-    "name": "Aetheria Link
+    "name": "AethLink
 🌐 🇺🇸 🇮🇳
 1080p",
     "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.1080p.NF.WEB-DL.Hindi.AAC5.1-English.AAC5.1.AV1-4kHdHub.Com.mkv

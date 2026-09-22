@@ -3,7 +3,7 @@
 exports[`Vidara vidara.to embed 1`] = `
 [
   {
-    "error": [Error: ENOENT: no such file or directory, open 'E:\\New Coding Projects\\1 Aetheria Link  Gemini\\src\\extractor\\__fixtures__\\Vidara\\post-https_vidara.toapistream-"filecode":"abc123""device":"web".error'],
+    "error": [Error: ENOENT: no such file or directory, open 'E:\\New Coding Projects\\Aetheria Link\\src\\extractor\\__fixtures__\\Vidara\\post-https_vidara.toapistream-"filecode":"abc123""device":"web".error'],
     "format": "unknown",
     "isExternal": true,
     "label": "Vidara",
@@ -35,7 +35,7 @@ exports[`Vidara vidara.to without filecode returns error 1`] = `
 exports[`Vidara vidara.to without streaming_url returns error 1`] = `
 [
   {
-    "error": [Error: ENOENT: no such file or directory, open 'E:\\New Coding Projects\\1 Aetheria Link  Gemini\\src\\extractor\\__fixtures__\\Vidara\\post-https_vidara.toapistream-"filecode":"nostream""device":"web".error'],
+    "error": [Error: ENOENT: no such file or directory, open 'E:\\New Coding Projects\\Aetheria Link\\src\\extractor\\__fixtures__\\Vidara\\post-https_vidara.toapistream-"filecode":"nostream""device":"web".error'],
     "format": "unknown",
     "isExternal": true,
     "label": "Vidara",

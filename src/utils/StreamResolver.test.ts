@@ -125,7 +125,7 @@ describe('resolve', () => {
 
     const stream = result.streams[0];
     expect(stream).toBeDefined();
-    expect(stream?.name).toBe('Aetheria Link');
+    expect(stream?.name).toBe('AethLink');
   });
 
   test('uses priority for sorting', async () => {

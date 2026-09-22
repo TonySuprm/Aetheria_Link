@@ -99,7 +99,7 @@ export function landingTemplate(manifest: CustomManifest, sources: Source[]) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AETHERIA LINK // Addon Configuration</title>
+<title>AethLink // Addon Configuration</title>
 <link rel="icon" href="${logo}">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Share+Tech+Mono&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -657,6 +657,49 @@ body {
   0% { transform: translateY(-100%); }
   100% { transform: translateY(100%); }
 }
+/* === Launch-in-Stremio install panel === */
+.install-row { display: flex; flex-direction: column; gap: 0.9rem; }
+.install-buttons { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: stretch; }
+.btn-add {
+  flex: 1 1 240px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  font-family: 'Space Grotesk', sans-serif; font-size: 1.02rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; padding: 0.95rem 1.25rem;
+  border-radius: 10px; cursor: pointer; color: #031712; background: var(--neon-green);
+  border: 1px solid var(--neon-green);
+  box-shadow: 0 0 18px rgba(0, 255, 102, 0.35), inset 0 0 10px rgba(0, 255, 102, 0.15);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.btn-add:hover { transform: translateY(-1px); box-shadow: 0 0 26px rgba(0, 255, 102, 0.5); filter: brightness(1.05); }
+.btn-add:active { transform: translateY(1px); }
+.btn-add-ghost {
+  align-self: flex-start; font-family: 'Share Tech Mono', monospace; font-size: 0.74rem;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--neon-cyan);
+  padding: 0.5rem 0.9rem; border-radius: 8px; cursor: pointer; background: transparent;
+  border: 1px solid var(--border-cyan); transition: all 0.2s;
+}
+.btn-add-ghost:hover { background: rgba(1, 205, 254, 0.12); color: #fff; }
+.install-mono { font-family: 'Share Tech Mono', monospace; font-size: 0.74rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--neon-cyan); }
+.install-url-row { display: flex; gap: 0.5rem; align-items: stretch; }
+.install-url-row input {
+  flex: 1; min-width: 0; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem;
+  letter-spacing: 0.02em; color: var(--neon-green); background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border-cyan); border-radius: 8px; padding: 0.6rem 0.75rem;
+  outline: none; box-shadow: inset 0 0 12px rgba(1, 205, 254, 0.06);
+}
+.install-url-row input:focus { border-color: var(--neon-cyan); box-shadow: inset 0 0 14px rgba(1, 205, 254, 0.12); }
+.btn-copy {
+  flex-shrink: 0; font-family: 'Share Tech Mono', monospace; font-size: 0.76rem; font-weight: 700;
+  letter-spacing: 0.14em; color: var(--neon-cyan); background: transparent;
+  border: 1px solid var(--neon-cyan); border-radius: 8px; padding: 0.6rem 1rem; cursor: pointer; transition: all 0.2s;
+}
+.btn-copy:hover { background: rgba(1, 205, 254, 0.12); color: #fff; box-shadow: 0 0 14px rgba(1, 205, 254, 0.3); }
+.btn-copy.copied, .install-url-row input.copied { color: var(--neon-green); border-color: var(--neon-green); box-shadow: 0 0 16px rgba(0, 255, 102, 0.5); }
+@media (max-width: 640px) {
+  .btn-add { flex: 1 1 100%; }
+  .install-url-row { flex-direction: column; }
+}
+
 </style>
 </head>
 <body>
@@ -675,6 +718,21 @@ body {
         <span>LATENCY: ~14ms</span>
       </div>
       <div class="system-desc">${shortDesc}</div>
+    </div>
+  </div>
+
+  <div class="hud-panel install-panel">
+    <div class="panel-header cyan">Launch in Stremio</div>
+    <div class="install-row">
+      <div class="install-buttons">
+        <button type="button" id="btnAddToStremio" class="btn-add">⚡ Add to Stremio</button>
+        <button type="button" id="btnStremioWeb" class="btn-add-ghost">Open in Stremio Web</button>
+      </div>
+      <div class="install-mono">Manifest URI</div>
+      <div class="install-url-row">
+        <input type="text" id="manifestUrlDisplay" readonly spellcheck="false" placeholder="https://your-host/…/manifest.json">
+        <button type="button" id="copyManifestBtn" class="btn-copy">COPY</button>
+      </div>
     </div>
   </div>
 
@@ -777,7 +835,7 @@ body {
 <div class="action-bar">
   <button type="button" id="saveApplyBtn" class="btn-primary">💾 Save &amp; Apply</button>
   <button type="button" id="copyStremioBtn" class="btn-secondary">🔗 Copy Stremio</button>
-  <button type="button" id="copyHttpBtn" class="btn-secondary">📋 Copy HTTP</button>
+  <button type="button" id="copyHttpBtn" class="btn-secondary">📋 Copy URL</button>
 </div>
 
 <script>
@@ -814,7 +872,22 @@ const getConfigPath = () => {
 
 const getStremioUrl = () => 'stremio://' + window.location.host + '/' + getConfigPath();
 const getHttpUrl  = () => window.location.protocol + '//' + window.location.host + '/' + getConfigPath();
-const updateLink = () => {};
+// The URI that is copied / used to add to Stremio is always HTTPS, so it is a
+// valid addon URL in Stremio (HTTPS only) on every deployment regardless of
+// whether this page was opened over http (local dev) or https (hosted).
+const getHttpsUrl = () => 'https://' + window.location.host + '/' + getConfigPath();
+
+const manifestUrlDisplay = document.getElementById('manifestUrlDisplay');
+const updateManifestUrl = () => { if (manifestUrlDisplay) manifestUrlDisplay.value = getHttpsUrl(); };
+
+// Kept as the single refresh hook so every toggle / save handler below keeps
+// the manifest URI in sync as the user edits the configuration.
+const updateLink = () => updateManifestUrl();
+
+let manifestTimer = null;
+const scheduleManifestUrl = () => { clearTimeout(manifestTimer); manifestTimer = setTimeout(updateManifestUrl, 80); };
+if (form) { form.addEventListener('input', scheduleManifestUrl); form.addEventListener('change', scheduleManifestUrl); }
+updateManifestUrl();
 
 function mountToggles(selector) {
   document.querySelectorAll(selector).forEach(chip => {
@@ -943,8 +1016,53 @@ document.getElementById('copyStremioBtn')?.addEventListener('click', function() 
   flashCopy(this, '🔗 Copy Stremio', getStremioUrl());
 });
 document.getElementById('copyHttpBtn')?.addEventListener('click', function() {
-  flashCopy(this, '📋 Copy HTTP', getHttpUrl());
+  flashCopy(this, '📋 Copy URL', getHttpsUrl());
 });
+
+/* === "Add to Stremio": deep-link (app) + web install, and copy the HTTPS manifest URI === */
+function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+  return new Promise((resolve, reject) => {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    let ok = false; try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    ta.remove(); ok ? resolve() : reject(new Error('copy failed'));
+  });
+}
+
+document.getElementById('btnAddToStremio')?.addEventListener('click', function() {
+  const url = getHttpsUrl();
+  const host = window.location.host || '';
+  if (host.includes('127.0.0.1') || host.includes('localhost')) {
+    copyText(url).catch(() => {});
+    window.alert('Local (HTTP) build detected — Stremio blocks automatic http installs.\nThe HTTPS manifest URL was copied to your clipboard. Open Stremio, go to Add-ons, and PASTE it into the search box to install.');
+    return;
+  }
+  const deepPath = url.slice(url.indexOf('://') + 3);
+  window.location.href = 'stremio://' + deepPath;
+});
+
+document.getElementById('btnStremioWeb')?.addEventListener('click', function() {
+  window.open('https://web.stremio.com/#/addons?addon=' + encodeURIComponent(getHttpsUrl()), '_blank');
+});
+
+const copyManifestBtn = document.getElementById('copyManifestBtn');
+if (copyManifestBtn) {
+  copyManifestBtn.addEventListener('click', function() {
+    const btn = copyManifestBtn;
+    const box = manifestUrlDisplay;
+    if (box) { box.focus(); box.select(); }
+    copyText(box ? box.value : getHttpsUrl()).then(() => {
+      btn.textContent = 'COPIED ✓'; btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 1600);
+    }).catch(() => {
+      btn.textContent = 'COPY?'; setTimeout(() => { btn.textContent = 'COPY'; }, 1600);
+    });
+  });
+}
+if (manifestUrlDisplay) manifestUrlDisplay.addEventListener('click', () => manifestUrlDisplay.select());
 
 /* === Restore debrid API keys from localStorage === */
 ['alldebridApiKey', 'realdebridApiKey'].forEach(function(k) {

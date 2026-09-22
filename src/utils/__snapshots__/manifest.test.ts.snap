@@ -12,12 +12,12 @@ exports[`buildManifest default manifest 1`] = `
     {
       "default": "checked",
       "key": "multi",
-      "title": "Multi 🌐 (1DDL, 4KHDHub, AcerMovies, Anidap, AnimeSalt, Animexin, DDLValley, DramaCoolg, DramaSuki, HDEncode, HDHub4u, ImdbSu, KatMovieHD, Kayoanime, KissAsian, KissAsianTV, Kitsu, Medeberiya, Miruro, MkvHub, MkvKing, MovieBox, Pahe.ink, SSRmovies, SinFlix, UHDMovies, Vadapav.mov, VidSrc, VidVault, VixSrc, WorldFree4u)",
+      "title": "Multi 🌐 (1DDL, 4KHDHub, AcerMovies, Anidap, AnimeSalt, Animexin, DDLValley, DonghuaStream, DramaCoolg, DramaSuki, HDEncode, HDHub4u, ImdbSu, KatMovieHD, Kayoanime, KissAsian, KissAsianTV, Kitsu, LuciferDonghua, Medeberiya, Miruro, MisterDonghua, MkvHub, MovieBox, Pahe.ink, SSRmovies, SinFlix, UHDMovies, Vadapav.mov, VidSrc, VidVault, VixSrc, WorldFree4u)",
       "type": "checkbox",
     },
     {
       "key": "en",
-      "title": "English 🇺🇸 (1DDL, AcerMovies, Anidap, AnimeSalt, DDLValley, HDEncode, Kayoanime, MkvKing, UHDMovies)",
+      "title": "English 🇺🇸 (1DDL, AcerMovies, Anidap, AnimeSalt, DDLValley, HDEncode, Kayoanime, UHDMovies)",
       "type": "checkbox",
     },
     {
@@ -38,7 +38,7 @@ exports[`buildManifest default manifest 1`] = `
     {
       "default": "checked",
       "key": "ja",
-      "title": "Japanese 🇯🇵 (Anidap, Animexin, DramaCoolg, DramaSuki, KissAsian, KissAsianTV, Miruro, SinFlix)",
+      "title": "Japanese 🇯🇵 (Anidap, Animexin, DonghuaStream, DramaCoolg, DramaSuki, KissAsian, KissAsianTV, LuciferDonghua, Miruro, MisterDonghua, SinFlix)",
       "type": "checkbox",
     },
     {
@@ -203,6 +203,11 @@ exports[`buildManifest default manifest 1`] = `
       "type": "checkbox",
     },
     {
+      "key": "disableSource_donghuastream",
+      "title": "Disable source DonghuaStream",
+      "type": "checkbox",
+    },
+    {
       "key": "disableSource_dramacoolg",
       "title": "Disable source DramaCoolg",
       "type": "checkbox",
@@ -253,6 +258,11 @@ exports[`buildManifest default manifest 1`] = `
       "type": "checkbox",
     },
     {
+      "key": "disableSource_luciferdonghua",
+      "title": "Disable source LuciferDonghua",
+      "type": "checkbox",
+    },
+    {
       "key": "disableSource_medeberiya",
       "title": "Disable source Medeberiya",
       "type": "checkbox",
@@ -263,13 +273,13 @@ exports[`buildManifest default manifest 1`] = `
       "type": "checkbox",
     },
     {
-      "key": "disableSource_mkvhub",
-      "title": "Disable source MkvHub",
+      "key": "disableSource_misterdonghua",
+      "title": "Disable source MisterDonghua",
       "type": "checkbox",
     },
     {
-      "key": "disableSource_mkvking",
-      "title": "Disable source MkvKing",
+      "key": "disableSource_mkvhub",
+      "title": "Disable source MkvHub",
       "type": "checkbox",
     },
     {
@@ -327,17 +337,17 @@ exports[`buildManifest default manifest 1`] = `
 
 Supported languages: English, Gujarati, Hindi, Indonesian, Japanese, Korean, Malayalam, Punjabi, Russian, Tamil, Telugu, Thai, Chinese
 
-Supported sources: 1DDL, 4KHDHub, AcerMovies, Anidap, AnimeSalt, Animexin, DDLValley, DramaCoolg, DramaSuki, HDEncode, HDHub4u, ImdbSu, KatMovieHD, Kayoanime, KissAsian, KissAsianTV, Kitsu, Medeberiya, Miruro, MkvHub, MkvKing, MovieBox, Pahe.ink, SinFlix, SSRmovies, UHDMovies, Vadapav.mov, VidSrc, VidVault, VixSrc, WorldFree4u
+Supported sources: 1DDL, 4KHDHub, AcerMovies, Anidap, AnimeSalt, Animexin, DDLValley, DonghuaStream, DramaCoolg, DramaSuki, HDEncode, HDHub4u, ImdbSu, KatMovieHD, Kayoanime, KissAsian, KissAsianTV, Kitsu, LuciferDonghua, Medeberiya, Miruro, MisterDonghua, MkvHub, MovieBox, Pahe.ink, SinFlix, SSRmovies, UHDMovies, Vadapav.mov, VidSrc, VidVault, VixSrc, WorldFree4u
 
 Supported extractors: ",
-  "id": "aetheria-link",
+  "id": "aethlink",
   "idPrefixes": [
     "tmdb:",
     "tt",
     "kitsu:",
   ],
   "logo": "/public/aetheria.png",
-  "name": "Aetheria Link",
+  "name": "AethLink",
   "resources": [
     "stream",
   ],

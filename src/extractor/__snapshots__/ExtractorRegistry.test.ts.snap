@@ -23,8 +23,7 @@ exports[`ExtractorRegistry returns external URLs if enabled by config 1`] = `
 exports[`ExtractorRegistry returns external url for error 1`] = `
 [
   {
-    "error": [Error: Fetcher error: 403: Forbidden
-],
+    "error": [Error: Error: No fixture found at "E:\\New Coding Projects\\1 Aetheria Link  Gemini\\src\\extractor/__fixtures__/ExtractorRegistry/https_dropload.iomocked-blocked.html".],
     "format": "unknown",
     "isExternal": true,
     "label": "Dropload",

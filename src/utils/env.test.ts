@@ -15,18 +15,18 @@ describe('env', () => {
   });
 
   test('envGetAppId', () => {
-    expect(envGetAppId()).toBe('aetheria-link');
+    expect(envGetAppId()).toBe('aethlink');
 
-    process.env['MANIFEST_ID'] = 'aetheria-link.dev';
-    expect(envGetAppId()).toBe('aetheria-link.dev');
+    process.env['MANIFEST_ID'] = 'aethlink.dev';
+    expect(envGetAppId()).toBe('aethlink.dev');
     delete process.env['MANIFEST_ID'];
   });
 
   test('envGetAppName', () => {
-    expect(envGetAppName()).toBe('Aetheria Link');
+    expect(envGetAppName()).toBe('AethLink');
 
-    process.env['MANIFEST_NAME'] = 'Aetheria Link | dev';
-    expect(envGetAppName()).toBe('Aetheria Link | dev');
+    process.env['MANIFEST_NAME'] = 'AethLink | dev';
+    expect(envGetAppName()).toBe('AethLink | dev');
     delete process.env['MANIFEST_NAME'];
   });
 

@@ -16,9 +16,9 @@ export const envGetRequired = (name: string): string => {
   return value;
 };
 
-export const envGetAppId = (): string => process.env['MANIFEST_ID'] || 'aetheria-link';
+export const envGetAppId = (): string => process.env['MANIFEST_ID'] || 'aethlink';
 
-export const envGetAppName = (): string => process.env['MANIFEST_NAME'] || 'Aetheria Link';
+export const envGetAppName = (): string => process.env['MANIFEST_NAME'] || 'AethLink';
 
 export const envIsProd = (): boolean => process.env['NODE_ENV'] === 'production';
 
