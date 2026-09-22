@@ -568,6 +568,7 @@ body {
   border-top: 1px solid rgba(1, 205, 254, 0.1);
   z-index: 100;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 1rem;
   backdrop-filter: blur(12px);
@@ -657,48 +658,6 @@ body {
   0% { transform: translateY(-100%); }
   100% { transform: translateY(100%); }
 }
-/* === Launch-in-Stremio install panel === */
-.install-row { display: flex; flex-direction: column; gap: 0.9rem; }
-.install-buttons { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: stretch; }
-.btn-add {
-  flex: 1 1 240px;
-  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
-  font-family: 'Space Grotesk', sans-serif; font-size: 1.02rem; font-weight: 700;
-  letter-spacing: 0.06em; text-transform: uppercase; padding: 0.95rem 1.25rem;
-  border-radius: 10px; cursor: pointer; color: #031712; background: var(--neon-green);
-  border: 1px solid var(--neon-green);
-  box-shadow: 0 0 18px rgba(0, 255, 102, 0.35), inset 0 0 10px rgba(0, 255, 102, 0.15);
-  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
-}
-.btn-add:hover { transform: translateY(-1px); box-shadow: 0 0 26px rgba(0, 255, 102, 0.5); filter: brightness(1.05); }
-.btn-add:active { transform: translateY(1px); }
-.btn-add-ghost {
-  align-self: flex-start; font-family: 'Share Tech Mono', monospace; font-size: 0.74rem;
-  letter-spacing: 0.08em; text-transform: uppercase; color: var(--neon-cyan);
-  padding: 0.5rem 0.9rem; border-radius: 8px; cursor: pointer; background: transparent;
-  border: 1px solid var(--border-cyan); transition: all 0.2s;
-}
-.btn-add-ghost:hover { background: rgba(1, 205, 254, 0.12); color: #fff; }
-.install-mono { font-family: 'Share Tech Mono', monospace; font-size: 0.74rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--neon-cyan); }
-.install-url-row { display: flex; gap: 0.5rem; align-items: stretch; }
-.install-url-row input {
-  flex: 1; min-width: 0; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem;
-  letter-spacing: 0.02em; color: var(--neon-green); background: rgba(0, 0, 0, 0.45);
-  border: 1px solid var(--border-cyan); border-radius: 8px; padding: 0.6rem 0.75rem;
-  outline: none; box-shadow: inset 0 0 12px rgba(1, 205, 254, 0.06);
-}
-.install-url-row input:focus { border-color: var(--neon-cyan); box-shadow: inset 0 0 14px rgba(1, 205, 254, 0.12); }
-.btn-copy {
-  flex-shrink: 0; font-family: 'Share Tech Mono', monospace; font-size: 0.76rem; font-weight: 700;
-  letter-spacing: 0.14em; color: var(--neon-cyan); background: transparent;
-  border: 1px solid var(--neon-cyan); border-radius: 8px; padding: 0.6rem 1rem; cursor: pointer; transition: all 0.2s;
-}
-.btn-copy:hover { background: rgba(1, 205, 254, 0.12); color: #fff; box-shadow: 0 0 14px rgba(1, 205, 254, 0.3); }
-.btn-copy.copied, .install-url-row input.copied { color: var(--neon-green); border-color: var(--neon-green); box-shadow: 0 0 16px rgba(0, 255, 102, 0.5); }
-@media (max-width: 640px) {
-  .btn-add { flex: 1 1 100%; }
-  .install-url-row { flex-direction: column; }
-}
 
 </style>
 </head>
@@ -718,21 +677,6 @@ body {
         <span>LATENCY: ~14ms</span>
       </div>
       <div class="system-desc">${shortDesc}</div>
-    </div>
-  </div>
-
-  <div class="hud-panel install-panel">
-    <div class="panel-header cyan">Launch in Stremio</div>
-    <div class="install-row">
-      <div class="install-buttons">
-        <button type="button" id="btnAddToStremio" class="btn-add">⚡ Add to Stremio</button>
-        <button type="button" id="btnStremioWeb" class="btn-add-ghost">Open in Stremio Web</button>
-      </div>
-      <div class="install-mono">Manifest URI</div>
-      <div class="install-url-row">
-        <input type="text" id="manifestUrlDisplay" readonly spellcheck="false" placeholder="https://your-host/…/manifest.json">
-        <button type="button" id="copyManifestBtn" class="btn-copy">COPY</button>
-      </div>
     </div>
   </div>
 
@@ -836,6 +780,8 @@ body {
   <button type="button" id="saveApplyBtn" class="btn-primary">💾 Save &amp; Apply</button>
   <button type="button" id="copyStremioBtn" class="btn-secondary">🔗 Copy Stremio</button>
   <button type="button" id="copyHttpBtn" class="btn-secondary">📋 Copy URL</button>
+  <button type="button" id="btnAddToStremio" class="btn-secondary">⚡ Add to Stremio</button>
+  <button type="button" id="btnStremioWeb" class="btn-secondary">🌐 Open in Stremio Web</button>
 </div>
 
 <script>
@@ -1037,7 +983,7 @@ document.getElementById('btnAddToStremio')?.addEventListener('click', function()
   const host = window.location.host || '';
   if (host.includes('127.0.0.1') || host.includes('localhost')) {
     copyText(url).catch(() => {});
-    window.alert('Local (HTTP) build detected — Stremio blocks automatic http installs.\nThe HTTPS manifest URL was copied to your clipboard. Open Stremio, go to Add-ons, and PASTE it into the search box to install.');
+    window.alert('Local (HTTP) build detected: Stremio blocks automatic http installs. The HTTPS manifest URL was copied to your clipboard. Open Stremio, go to Add-ons, and paste it into the search box to install it there.');
     return;
   }
   const deepPath = url.slice(url.indexOf('://') + 3);
