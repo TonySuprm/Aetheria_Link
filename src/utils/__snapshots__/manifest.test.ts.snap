@@ -337,8 +337,6 @@ exports[`buildManifest default manifest 1`] = `
 
 Supported languages: English, Gujarati, Hindi, Indonesian, Japanese, Korean, Malayalam, Punjabi, Russian, Tamil, Telugu, Thai, Chinese
 
-Supported sources: 1DDL, 4KHDHub, AcerMovies, Anidap, AnimeSalt, Animexin, DDLValley, DonghuaStream, DramaCoolg, DramaSuki, HDEncode, HDHub4u, ImdbSu, KatMovieHD, Kayoanime, KissAsian, KissAsianTV, Kitsu, LuciferDonghua, Medeberiya, Miruro, MisterDonghua, MkvHub, MovieBox, Pahe.ink, SinFlix, SSRmovies, UHDMovies, Vadapav.mov, VidSrc, VidVault, VixSrc, WorldFree4u
-
 Supported extractors: ",
   "id": "aethlink",
   "idPrefixes": [
