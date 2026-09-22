@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`ExtractorRegistry empty results are cached 1`] = `[]`;
+
+exports[`ExtractorRegistry returns error result from extractor 1`] = `[]`;
+
+exports[`ExtractorRegistry returns external URLs if enabled by config 1`] = `
+[
+  {
+    "error": [Error: Error: No fixture found at "E:\\New Coding Projects\\1 Aetheria Link  Gemini\\src\\extractor/__fixtures__/ExtractorRegistry/https_mixdrop.age3nzwveprim63or6".],
+    "format": "unknown",
+    "isExternal": true,
+    "label": "Mixdrop",
+    "meta": {
+      "extractorId": "mixdrop",
+    },
+    "ttl": 0,
+    "url": "https://mixdrop.ag/e/3nzwveprim63or6",
+  },
+]
+`;
+
+exports[`ExtractorRegistry returns external url for error 1`] = `
+[
+  {
+    "error": [Error: Fetcher error: 403: Forbidden
+],
+    "format": "unknown",
+    "isExternal": true,
+    "label": "Dropload",
+    "meta": {
+      "extractorId": "dropload",
+    },
+    "ttl": 0,
+    "url": "https://dropload.io/mocked-blocked.html",
+  },
+]
+`;

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":maintainLockFilesWeekly",
+    ":rebaseStalePrs"
+  ],
+  "assignees": ["newman2x"],
+  "configMigration": true,
+  "osvVulnerabilityAlerts": true,
+  "postUpdateOptions": [
+    "npmDedupe"
+  ],
+  "packageRules": [
+    {
+      "description": "Update types once per week",
+      "matchDatasources": ["npm"],
+      "matchPackageNames": ["/^@types/"],
+      "extends": ["schedule:weekly"]
+    },
+    {
+      "description": "Update user-agents once per month",
+      "matchDatasources": ["npm"],
+      "matchPackageNames": ["/^user-agents$/"],
+      "extends": ["schedule:monthly"]
+    },
+    {
+      "description": "Pin proxy agents below ESM-only versions",
+      "matchPackageNames": ["http-proxy-agent", "https-proxy-agent", "socks-proxy-agent"],
+      "allowedVersions": "<8"
+    },
+    {
+      "description": "Pin sqlite3 below v6 (major breaking change)",
+      "matchPackageNames": ["sqlite3"],
+      "allowedVersions": "<6"
+    },
+    {
+      "description": "Pin resolve to stable v1 only (block pre-release)",
+      "matchPackageNames": ["resolve"],
+      "allowedVersions": "^1.22.0"
+    },
+    {
+      "description": "Pin typescript below v6 (breaking tsconfig changes)",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<6"
+    },
+    {
+      "description": "Pin eslint below v10 (requires eslint-plugin-import-x migration)",
+      "matchPackageNames": ["eslint"],
+      "allowedVersions": "<10"
+    }
+  ]
+}

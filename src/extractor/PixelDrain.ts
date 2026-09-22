@@ -1,0 +1,89 @@
+import winston from 'winston';
+import { Context, Format, InternalUrlResult, Meta } from '../types';
+import { Fetcher } from '../utils';
+import { Extractor } from './Extractor';
+
+// Pixeldrain exposes a direct download endpoint at /api/file/<id>?download= which
+// serves the raw file (mkvdrama links here as https://pixeldrain.dev/u/<id>).
+export class PixelDrain extends Extractor {
+  public override readonly id = 'pixeldrain';
+
+  public override readonly label = 'PixelDrain';
+  // Eager: the PixelDrain API call is fast and returns a short local /relay URL,
+  // so resolve it at stream-list time instead of burdening the user with the
+  // long JSON-encoded `/extract/` URL and deferred extraction.
+  public override readonly lazyExtract = false;
+  public override readonly ttl = 3600000; // 1h
+
+  public constructor(fetcher: Fetcher, logger: winston.Logger) {
+    super(fetcher, logger);
+  }
+
+  public override supports(_ctx: Context, url: URL): boolean {
+    return /pixeldrain/.test(url.host);
+  }
+
+  protected override async extractInternal(ctx: Context, url: URL, meta: Meta): Promise<InternalUrlResult[]> {
+    const segments = url.pathname.split('/').filter(Boolean);
+    const id = segments[segments.length - 1];
+    if (!id) {
+      return [];
+    }
+    let targetId = id;
+    const origin = `${url.protocol}//${url.host}`;
+
+    if (url.pathname.includes('/l/')) {
+      const listData = await this.fetcher.json(ctx, new URL(`/api/list/${id}`, origin));
+      if (listData?.files && Array.isArray(listData.files) && listData.files.length > 0) {
+        let matched = false;
+        // Attempt to match by episode title/tag
+        if (meta.episode !== undefined) {
+          const EP_REGEX = /[.\s_-][eE]0*(\d+)/i;
+          for (const f of listData.files) {
+            const tagMatch = (f.name as string).match(EP_REGEX);
+            if (tagMatch && tagMatch[1] && parseInt(tagMatch[1], 10) === meta.episode) {
+              targetId = f.id;
+              matched = true;
+              break;
+            }
+          }
+        }
+        if (!matched) {
+          targetId = listData.files[0].id; // Fallback to first file
+        }
+      } else {
+        return [];
+      }
+    }
+
+    let fileBytes: number | undefined;
+    try {
+      const info = await this.fetcher.json(ctx, new URL(`/api/file/${targetId}/info`, origin)) as
+        { size?: number; name?: string } | undefined;
+      fileBytes = typeof info?.size === 'number' && info.size > 0 ? info.size : undefined;
+      if (!meta.title && info?.name) {
+        meta.title = info.name;
+      }
+    } catch {
+      // Public info endpoint may be disabled for some files; keep the link and fall back
+      // to any size the source already provided.
+    }
+
+    const apiUrl = new URL(`/api/file/${targetId}?download=`, origin);
+    const relayUrl = new URL('/relay', ctx.hostUrl);
+    relayUrl.searchParams.set('url', apiUrl.href);
+    relayUrl.searchParams.set('referer', origin);
+
+    return [{
+      url: relayUrl,
+      format: Format.unknown,
+      label: 'PixelDrain',
+      meta: {
+        ...meta,
+        extractorId: this.id,
+        referer: origin,
+        ...(fileBytes && !meta.bytes ? { bytes: fileBytes } : {}),
+      }
+    }];
+  }
+}

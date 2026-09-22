@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Fastream expired or deleted 1`] = `
+[
+  {
+    "error": [Error: Error: No fixture found at "E:\\New Coding Projects\\1 Aetheria Link  Gemini\\src\\extractor/__fixtures__/Fastream/https_fastream.toembed-a9rp1d1pqom7.html".],
+    "format": "unknown",
+    "isExternal": true,
+    "label": "Fastream (MFP)",
+    "meta": {
+      "extractorId": "fastream",
+    },
+    "ttl": 0,
+    "url": "https://fastream.to/embed-a9rp1d1pqom7.html",
+  },
+]
+`;
+
+exports[`Fastream fastream.to embed 1`] = `
+[
+  {
+    "error": [Error: Error: No fixture found at "E:\\New Coding Projects\\1 Aetheria Link  Gemini\\src\\extractor/__fixtures__/Fastream/https_fastream.toembed-3aooif4ozt10.html".],
+    "format": "unknown",
+    "isExternal": true,
+    "label": "Fastream (MFP)",
+    "meta": {
+      "extractorId": "fastream",
+    },
+    "ttl": 0,
+    "url": "https://fastream.to/embed-3aooif4ozt10.html",
+  },
+]
+`;

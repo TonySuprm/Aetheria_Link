@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`FileMoon extracts stream via MediaFlow extractor 1`] = `
+[
+  {
+    "format": "mp4",
+    "label": "FileMoon (MFP)",
+    "meta": {
+      "extractorId": "filemoon",
+    },
+    "ttl": 900000,
+    "url": "https://mediaflow.test.org/extractor/video?host=filemoon&api_password=test&d=https%3A%2F%2Ffilemoon.sx%2Fe%2Fc5lhlypfasmm&h_referer=https%3A%2F%2Ffilemoon.sx%2Fe%2Fc5lhlypfasmm&redirect_stream=true&dummy=ignore.mp4",
+  },
+]
+`;
+
+exports[`FileMoon handles extraction failure gracefully 1`] = `
+[
+  {
+    "format": "mp4",
+    "label": "FileMoon (MFP)",
+    "meta": {
+      "extractorId": "filemoon",
+    },
+    "ttl": 900000,
+    "url": "https://mediaflow.test.org/extractor/video?host=filemoon&api_password=test&d=https%3A%2F%2Ffilemoon.sx%2Fe%2Fn7i8zodwjqr9&h_referer=https%3A%2F%2Ffilemoon.sx%2Fe%2Fn7i8zodwjqr9&redirect_stream=true&dummy=ignore.mp4",
+  },
+]
+`;
+
+exports[`FileMoon supports alternative domain 1`] = `[]`;

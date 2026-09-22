@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Voe charlestoughrace.com custom domain 1`] = `[]`;
+
+exports[`Voe embed only urls which otherwise lead to 404 1`] = `[]`;
+
+exports[`Voe encoding error 1`] = `
+[
+  {
+    "format": "mp4",
+    "label": "VOE (MFP)",
+    "meta": {
+      "extractorId": "voe",
+    },
+    "ttl": 900000,
+    "url": "https://mediaflow.test.org/extractor/video?host=voe&api_password=test&d=https%3A%2F%2Fvoe.sx%2Fe%2Fc2yxvit4f6bz&h_referer=https%3A%2F%2Fvoe.sx%2Fe%2Fc2yxvit4f6bz&redirect_stream=true&dummy=ignore.mp4",
+  },
+]
+`;
+
+exports[`Voe jilliandescribecompany 1`] = `[]`;
+
+exports[`Voe no file size in page 1`] = `[]`;
+
+exports[`Voe premium only without resolution 1`] = `[]`;

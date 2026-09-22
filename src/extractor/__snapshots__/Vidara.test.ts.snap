@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Vidara vidara.to embed 1`] = `
+[
+  {
+    "error": [Error: ENOENT: no such file or directory, open 'E:\\New Coding Projects\\1 Aetheria Link  Gemini\\src\\extractor\\__fixtures__\\Vidara\\post-https_vidara.toapistream-"filecode":"abc123""device":"web".error'],
+    "format": "unknown",
+    "isExternal": true,
+    "label": "Vidara",
+    "meta": {
+      "extractorId": "vidara",
+    },
+    "ttl": 0,
+    "url": "https://vidara.to/e/abc123",
+  },
+]
+`;
+
+exports[`Vidara vidara.to without filecode returns error 1`] = `
+[
+  {
+    "error": [Error: Could not extract filecode from Vidara URL],
+    "format": "unknown",
+    "isExternal": true,
+    "label": "Vidara",
+    "meta": {
+      "extractorId": "vidara",
+    },
+    "ttl": 0,
+    "url": "https://vidara.to/",
+  },
+]
+`;
+
+exports[`Vidara vidara.to without streaming_url returns error 1`] = `
+[
+  {
+    "error": [Error: ENOENT: no such file or directory, open 'E:\\New Coding Projects\\1 Aetheria Link  Gemini\\src\\extractor\\__fixtures__\\Vidara\\post-https_vidara.toapistream-"filecode":"nostream""device":"web".error'],
+    "format": "unknown",
+    "isExternal": true,
+    "label": "Vidara",
+    "meta": {
+      "extractorId": "vidara",
+    },
+    "ttl": 0,
+    "url": "https://vidara.to/e/nostream",
+  },
+]
+`;

@@ -1,0 +1,27 @@
+node_modules
+dist
+.git
+.github
+*.log
+*.sqlite*
+coverage
+backup 1
+*.png
+*.html
+*.json
+*.txt
+*.md
+!package*.json
+!tsconfig*.json
+!eslint.config.mjs
+
+# External sidecar submodule/repo checkouts are not used in the bundled image.
+# FlareSolverr is pulled from the same base image; MediaFlow Proxy is copied from
+# the prebuilt tonysupr/mediaflow-proxy-light stage.
+/FlareSolverr/
+/mediaflow-proxy/
+
+# Session/local artifacts
+logs/
+*.zip
+start/

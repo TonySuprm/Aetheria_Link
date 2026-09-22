@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Uqload file not found 1`] = `
+[
+  {
+    "format": "mp4",
+    "label": "Uqload (MFP)",
+    "meta": {
+      "extractorId": "uqload",
+    },
+    "ttl": 900000,
+    "url": "https://mediaflow.test.org/extractor/video?host=uqload&api_password=test&d=https%3A%2F%2Fuqload.cx%2F2ua47fdfkjgd.html&h_referer=https%3A%2F%2Fuqload.cx%2F2ua47fdfkjgd.html&redirect_stream=true&dummy=ignore.mp4",
+  },
+]
+`;
+
+exports[`Uqload uqload.net /embed- 1`] = `
+[
+  {
+    "format": "mp4",
+    "label": "Uqload (MFP)",
+    "meta": {
+      "extractorId": "uqload",
+    },
+    "ttl": 900000,
+    "url": "https://mediaflow.test.org/extractor/video?host=uqload&api_password=test&d=https%3A%2F%2Fuqload.net%2Fembed-z0xbr87oz637.html&h_referer=https%3A%2F%2Fuqload.net%2Fembed-z0xbr87oz637.html&redirect_stream=true&dummy=ignore.mp4",
+  },
+]
+`;

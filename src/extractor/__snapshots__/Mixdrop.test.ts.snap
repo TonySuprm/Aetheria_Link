@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Mixdrop deleted or expired file 1`] = `[]`;
+
+exports[`Mixdrop mixdrop.my /e/ 1`] = `
+[
+  {
+    "format": "mp4",
+    "label": "Mixdrop",
+    "meta": {
+      "extractorId": "mixdrop",
+      "referer": "https://mixdrop.my/",
+      "title": "Mixdrop",
+    },
+    "ttl": 900000,
+    "url": "http://localhost/relay?url=https%3A%2F%2Fa-delivery22.mxcontent.net%2Fv2%2Fknq0kj8waq44l8.mp4%3Fs%3DrwlGD_z8ow2aStfsNQchww%26e%3D1782776949%26_t%3D1782756542&referer=https%3A%2F%2Fmixdrop.my%2F",
+  },
+]
+`;

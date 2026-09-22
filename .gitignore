@@ -1,0 +1,61 @@
+/.idea
+/coverage/
+/dist/
+/node_modules/
+.env
+beamup-host.json
+
+# Sidecar binaries and external repositories (must be set up separately)
+/skip-redirect/
+/browser-extension/
+/mediaflow-proxy/
+
+# Runtime logs
+*.log
+/addon-realtime.log
+
+# Local debug/scratch dumps
+freemovies_*.json
+freemovies_*.html
+fm_*.json
+fs_*.json
+rm_*.json
+rd_hosts*.json
+search_page.json
+seriespage.html
+anidap_page.html
+bundle_dump.txt
+debug_vidsrc.txt
+hdhub4u_test.txt
+django_page.json
+hotd_page.json
+parse_hosts.js
+inspect_*.js
+mb_*.html
+mb_*.png
+uhdmovies.js
+diag-hubcloud.ts
+write-Output
+
+# Session/debug artifacts
+/logs/
+*.zip
+diff.md
+start/
+
+# Local runtime config (contains API keys / secrets — keep out of git)
+/aetheria-link-config.json
+
+# Scratch + one-off debug scripts and data
+/scratch/
+/ad_hosts.json
+/test_*
+/test-*
+/test.js
+/fetch_ep.mjs
+
+# Debug outputs and page dumps
+/out_*.txt
+/jest_output.txt
+/lucifer_html.txt
+/*.html

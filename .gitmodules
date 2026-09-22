@@ -1,0 +1,3 @@
+[submodule "FlareSolverr"]
+	path = FlareSolverr
+	url = https://github.com/FlareSolverr/FlareSolverr.git

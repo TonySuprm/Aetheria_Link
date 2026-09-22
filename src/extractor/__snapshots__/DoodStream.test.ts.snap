@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`DoodStream can guess height from title 1`] = `[]`;
+
+exports[`DoodStream dood.to 1`] = `
+[
+  {
+    "format": "mp4",
+    "label": "DoodStream (MFP)",
+    "meta": {
+      "extractorId": "doodstream",
+    },
+    "ttl": 900000,
+    "url": "https://mediaflow.test.org/extractor/video?host=doodstream&api_password=test&d=http%3A%2F%2Fdood.to%2Fe%2Fsk1m9eumzyjj&h_referer=http%3A%2F%2Fdood.to%2Fe%2Fsk1m9eumzyjj&redirect_stream=true&dummy=ignore.mp4",
+  },
+]
+`;
+
+exports[`DoodStream not found 1`] = `
+[
+  {
+    "format": "mp4",
+    "label": "DoodStream (MFP)",
+    "meta": {
+      "extractorId": "doodstream",
+    },
+    "ttl": 900000,
+    "url": "https://mediaflow.test.org/extractor/video?host=doodstream&api_password=test&d=https%3A%2F%2Fmyvidplay.com%2Fe%2Fcz7cus0bvlzr&h_referer=https%3A%2F%2Fmyvidplay.com%2Fe%2Fcz7cus0bvlzr&redirect_stream=true&dummy=ignore.mp4",
+  },
+]
+`;

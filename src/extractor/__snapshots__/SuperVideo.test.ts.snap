@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`SuperVideo deleted or expired file 1`] = `[]`;
+
+exports[`SuperVideo embed only 1`] = `[]`;
+
+exports[`SuperVideo processing video 1`] = `[]`;
+
+exports[`SuperVideo supervideo.cc /e/ 1`] = `[]`;
+
+exports[`SuperVideo supervideo.tv /embed-/ 1`] = `[]`;

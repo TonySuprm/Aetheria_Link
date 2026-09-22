@@ -1,0 +1,1055 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`buildManifest default manifest 1`] = `
+{
+  "behaviorHints": {
+    "configurable": true,
+    "configurationRequired": false,
+    "p2p": false,
+  },
+  "catalogs": [],
+  "config": [
+    {
+      "default": "checked",
+      "key": "multi",
+      "title": "Multi 🌐 (1DDL, 4KHDHub, AcerMovies, Anidap, AnimeSalt, Animexin, DDLValley, DramaCoolg, DramaSuki, HDEncode, HDHub4u, ImdbSu, KatMovieHD, Kayoanime, KissAsian, KissAsianTV, Kitsu, Medeberiya, Miruro, MkvHub, MkvKing, MovieBox, Pahe.ink, SSRmovies, SinFlix, UHDMovies, Vadapav.mov, VidSrc, VidVault, VixSrc, WorldFree4u)",
+      "type": "checkbox",
+    },
+    {
+      "key": "en",
+      "title": "English 🇺🇸 (1DDL, AcerMovies, Anidap, AnimeSalt, DDLValley, HDEncode, Kayoanime, MkvKing, UHDMovies)",
+      "type": "checkbox",
+    },
+    {
+      "key": "gu",
+      "title": "Gujarati 🇮🇳 (HDHub4u)",
+      "type": "checkbox",
+    },
+    {
+      "key": "hi",
+      "title": "Hindi 🇮🇳 (4KHDHub, AcerMovies, AnimeSalt, HDHub4u, KatMovieHD, MkvHub, SSRmovies, UHDMovies, WorldFree4u)",
+      "type": "checkbox",
+    },
+    {
+      "key": "id",
+      "title": "Indonesian 🇮🇩 (DramaSuki, SinFlix)",
+      "type": "checkbox",
+    },
+    {
+      "default": "checked",
+      "key": "ja",
+      "title": "Japanese 🇯🇵 (Anidap, Animexin, DramaCoolg, DramaSuki, KissAsian, KissAsianTV, Miruro, SinFlix)",
+      "type": "checkbox",
+    },
+    {
+      "default": "checked",
+      "key": "ko",
+      "title": "Korean 🇰🇷 (DramaCoolg, DramaSuki, KissAsian, KissAsianTV, Miruro, SinFlix)",
+      "type": "checkbox",
+    },
+    {
+      "key": "ml",
+      "title": "Malayalam 🇮🇳 (HDHub4u)",
+      "type": "checkbox",
+    },
+    {
+      "key": "pa",
+      "title": "Punjabi 🇮🇳 (HDHub4u)",
+      "type": "checkbox",
+    },
+    {
+      "key": "ru",
+      "title": "Russian 🇷🇺 (VidVault)",
+      "type": "checkbox",
+    },
+    {
+      "key": "ta",
+      "title": "Tamil 🇮🇳 (4KHDHub, HDHub4u)",
+      "type": "checkbox",
+    },
+    {
+      "key": "te",
+      "title": "Telugu 🇮🇳 (4KHDHub, HDHub4u)",
+      "type": "checkbox",
+    },
+    {
+      "key": "th",
+      "title": "Thai 🇹🇭 (DramaSuki, Miruro, SinFlix)",
+      "type": "checkbox",
+    },
+    {
+      "default": "checked",
+      "key": "zh",
+      "title": "Chinese 🇨🇳 (DramaCoolg, DramaSuki, Miruro, SinFlix)",
+      "type": "checkbox",
+    },
+    {
+      "key": "showErrors",
+      "title": "Show errors",
+      "type": "checkbox",
+    },
+    {
+      "key": "includeExternalUrls",
+      "title": "Include external URLs in results",
+      "type": "checkbox",
+    },
+    {
+      "default": "",
+      "key": "mediaFlowProxyUrl",
+      "title": "MediaFlow Proxy URL",
+      "type": "text",
+    },
+    {
+      "default": "",
+      "key": "mediaFlowProxyPassword",
+      "title": "MediaFlow Proxy Password",
+      "type": "password",
+    },
+    {
+      "default": "",
+      "key": "alldebridApiKey",
+      "title": "AllDebrid API Key",
+      "type": "password",
+    },
+    {
+      "default": "",
+      "key": "realdebridApiKey",
+      "title": "RealDebrid API Token",
+      "type": "password",
+    },
+    {
+      "key": "excludeResolution_2160p",
+      "title": "Exclude resolution 2160p",
+      "type": "checkbox",
+    },
+    {
+      "key": "excludeResolution_1440p",
+      "title": "Exclude resolution 1440p",
+      "type": "checkbox",
+    },
+    {
+      "key": "excludeResolution_1080p",
+      "title": "Exclude resolution 1080p",
+      "type": "checkbox",
+    },
+    {
+      "key": "excludeResolution_720p",
+      "title": "Exclude resolution 720p",
+      "type": "checkbox",
+    },
+    {
+      "key": "excludeResolution_576p",
+      "title": "Exclude resolution 576p",
+      "type": "checkbox",
+    },
+    {
+      "key": "excludeResolution_480p",
+      "title": "Exclude resolution 480p",
+      "type": "checkbox",
+    },
+    {
+      "key": "excludeResolution_360p",
+      "title": "Exclude resolution 360p",
+      "type": "checkbox",
+    },
+    {
+      "key": "excludeResolution_240p",
+      "title": "Exclude resolution 240p",
+      "type": "checkbox",
+    },
+    {
+      "key": "excludeResolution_144p",
+      "title": "Exclude resolution 144p",
+      "type": "checkbox",
+    },
+    {
+      "key": "excludeResolution_Unknown",
+      "title": "Exclude resolution Unknown",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_oneddl",
+      "title": "Disable source 1DDL",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_4khdhub",
+      "title": "Disable source 4KHDHub",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_acermovies",
+      "title": "Disable source AcerMovies",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_anidap",
+      "title": "Disable source Anidap",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_animesalt",
+      "title": "Disable source AnimeSalt",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_animexin",
+      "title": "Disable source Animexin",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_ddlvalley",
+      "title": "Disable source DDLValley",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_dramacoolg",
+      "title": "Disable source DramaCoolg",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_dramasuki",
+      "title": "Disable source DramaSuki",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_hdencode",
+      "title": "Disable source HDEncode",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_hdhub4u",
+      "title": "Disable source HDHub4u",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_imdbsu",
+      "title": "Disable source ImdbSu",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_katmoviehd",
+      "title": "Disable source KatMovieHD",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_kayoanime",
+      "title": "Disable source Kayoanime",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_kissasian",
+      "title": "Disable source KissAsian",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_kissasiantv",
+      "title": "Disable source KissAsianTV",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_kitsu",
+      "title": "Disable source Kitsu",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_medeberiya",
+      "title": "Disable source Medeberiya",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_miruro",
+      "title": "Disable source Miruro",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_mkvhub",
+      "title": "Disable source MkvHub",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_mkvking",
+      "title": "Disable source MkvKing",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_moviebox",
+      "title": "Disable source MovieBox",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_paheink",
+      "title": "Disable source Pahe.ink",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_sinflix",
+      "title": "Disable source SinFlix",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_ssrmovies",
+      "title": "Disable source SSRmovies",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_uhdmovies",
+      "title": "Disable source UHDMovies",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_vadapav",
+      "title": "Disable source Vadapav.mov",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_vidsrc",
+      "title": "Disable source VidSrc",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_vidvault",
+      "title": "Disable source VidVault",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_vixsrc",
+      "title": "Disable source VixSrc",
+      "type": "checkbox",
+    },
+    {
+      "key": "disableSource_worldfree4u",
+      "title": "Disable source WorldFree4u",
+      "type": "checkbox",
+    },
+  ],
+  "description": "Provides HTTP URLs from streaming websites. Configure add-on for additional languages. Add MediaFlow proxy for more URLs.
+
+Supported languages: English, Gujarati, Hindi, Indonesian, Japanese, Korean, Malayalam, Punjabi, Russian, Tamil, Telugu, Thai, Chinese
+
+Supported sources: 1DDL, 4KHDHub, AcerMovies, Anidap, AnimeSalt, Animexin, DDLValley, DramaCoolg, DramaSuki, HDEncode, HDHub4u, ImdbSu, KatMovieHD, Kayoanime, KissAsian, KissAsianTV, Kitsu, Medeberiya, Miruro, MkvHub, MkvKing, MovieBox, Pahe.ink, SinFlix, SSRmovies, UHDMovies, Vadapav.mov, VidSrc, VidVault, VixSrc, WorldFree4u
+
+Supported extractors: ",
+  "id": "aetheria-link",
+  "idPrefixes": [
+    "tmdb:",
+    "tt",
+    "kitsu:",
+  ],
+  "logo": "/public/aetheria.png",
+  "name": "Aetheria Link",
+  "resources": [
+    "stream",
+  ],
+  "stremioAddonsConfig": {
+    "issuer": "https://stremio-addons.net",
+    "signature": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..h1oW2E0XXKLldUqO-ReSUA.fejuyGAvmc_CdT9dnq2srZCgoC42ak-Rqeo7IKsEN3DPRpz8x-hmvbuBI_7BUU2PsFMSni35m_Lv0teUNQDPvlrm7t1FCZINMR4ty_Hee6If5m6J4kSzafD75HhWvxFU.FAcDZ5qZrTPDeRAVOUI2tQ",
+  },
+  "types": [
+    "movie",
+    "series",
+    "anime",
+  ],
+  "version": Any<String>,
+}
+`;
+
+exports[`buildManifest disable extractors 1`] = `
+[
+  {
+    "key": "showErrors",
+    "title": "Show errors",
+    "type": "checkbox",
+  },
+  {
+    "key": "includeExternalUrls",
+    "title": "Include external URLs in results",
+    "type": "checkbox",
+  },
+  {
+    "default": "",
+    "key": "mediaFlowProxyUrl",
+    "title": "MediaFlow Proxy URL",
+    "type": "text",
+  },
+  {
+    "default": "",
+    "key": "mediaFlowProxyPassword",
+    "title": "MediaFlow Proxy Password",
+    "type": "password",
+  },
+  {
+    "default": "",
+    "key": "alldebridApiKey",
+    "title": "AllDebrid API Key",
+    "type": "password",
+  },
+  {
+    "default": "",
+    "key": "realdebridApiKey",
+    "title": "RealDebrid API Token",
+    "type": "password",
+  },
+  {
+    "key": "excludeResolution_2160p",
+    "title": "Exclude resolution 2160p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_1440p",
+    "title": "Exclude resolution 1440p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_1080p",
+    "title": "Exclude resolution 1080p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_720p",
+    "title": "Exclude resolution 720p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_576p",
+    "title": "Exclude resolution 576p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_480p",
+    "title": "Exclude resolution 480p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_360p",
+    "title": "Exclude resolution 360p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_240p",
+    "title": "Exclude resolution 240p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_144p",
+    "title": "Exclude resolution 144p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_Unknown",
+    "title": "Exclude resolution Unknown",
+    "type": "checkbox",
+  },
+  {
+    "default": "checked",
+    "key": "disableExtractor_doodstream",
+    "title": "Disable extractor DoodStream",
+    "type": "checkbox",
+  },
+  {
+    "key": "disableExtractor_supervideo",
+    "title": "Disable extractor SuperVideo",
+    "type": "checkbox",
+  },
+]
+`;
+
+exports[`buildManifest has checked excludeResolution_2160p 1`] = `
+[
+  {
+    "key": "showErrors",
+    "title": "Show errors",
+    "type": "checkbox",
+  },
+  {
+    "key": "includeExternalUrls",
+    "title": "Include external URLs in results",
+    "type": "checkbox",
+  },
+  {
+    "default": "",
+    "key": "mediaFlowProxyUrl",
+    "title": "MediaFlow Proxy URL",
+    "type": "text",
+  },
+  {
+    "default": "",
+    "key": "mediaFlowProxyPassword",
+    "title": "MediaFlow Proxy Password",
+    "type": "password",
+  },
+  {
+    "default": "",
+    "key": "alldebridApiKey",
+    "title": "AllDebrid API Key",
+    "type": "password",
+  },
+  {
+    "default": "",
+    "key": "realdebridApiKey",
+    "title": "RealDebrid API Token",
+    "type": "password",
+  },
+  {
+    "default": "checked",
+    "key": "excludeResolution_2160p",
+    "title": "Exclude resolution 2160p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_1440p",
+    "title": "Exclude resolution 1440p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_1080p",
+    "title": "Exclude resolution 1080p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_720p",
+    "title": "Exclude resolution 720p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_576p",
+    "title": "Exclude resolution 576p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_480p",
+    "title": "Exclude resolution 480p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_360p",
+    "title": "Exclude resolution 360p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_240p",
+    "title": "Exclude resolution 240p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_144p",
+    "title": "Exclude resolution 144p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_Unknown",
+    "title": "Exclude resolution Unknown",
+    "type": "checkbox",
+  },
+]
+`;
+
+exports[`buildManifest has checked includeExternalUrls 1`] = `
+[
+  {
+    "key": "showErrors",
+    "title": "Show errors",
+    "type": "checkbox",
+  },
+  {
+    "default": "checked",
+    "key": "includeExternalUrls",
+    "title": "Include external URLs in results",
+    "type": "checkbox",
+  },
+  {
+    "default": "",
+    "key": "mediaFlowProxyUrl",
+    "title": "MediaFlow Proxy URL",
+    "type": "text",
+  },
+  {
+    "default": "",
+    "key": "mediaFlowProxyPassword",
+    "title": "MediaFlow Proxy Password",
+    "type": "password",
+  },
+  {
+    "default": "",
+    "key": "alldebridApiKey",
+    "title": "AllDebrid API Key",
+    "type": "password",
+  },
+  {
+    "default": "",
+    "key": "realdebridApiKey",
+    "title": "RealDebrid API Token",
+    "type": "password",
+  },
+  {
+    "key": "excludeResolution_2160p",
+    "title": "Exclude resolution 2160p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_1440p",
+    "title": "Exclude resolution 1440p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_1080p",
+    "title": "Exclude resolution 1080p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_720p",
+    "title": "Exclude resolution 720p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_576p",
+    "title": "Exclude resolution 576p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_480p",
+    "title": "Exclude resolution 480p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_360p",
+    "title": "Exclude resolution 360p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_240p",
+    "title": "Exclude resolution 240p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_144p",
+    "title": "Exclude resolution 144p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_Unknown",
+    "title": "Exclude resolution Unknown",
+    "type": "checkbox",
+  },
+]
+`;
+
+exports[`buildManifest has checked showErrors 1`] = `
+[
+  {
+    "default": "checked",
+    "key": "showErrors",
+    "title": "Show errors",
+    "type": "checkbox",
+  },
+  {
+    "key": "includeExternalUrls",
+    "title": "Include external URLs in results",
+    "type": "checkbox",
+  },
+  {
+    "default": "",
+    "key": "mediaFlowProxyUrl",
+    "title": "MediaFlow Proxy URL",
+    "type": "text",
+  },
+  {
+    "default": "",
+    "key": "mediaFlowProxyPassword",
+    "title": "MediaFlow Proxy Password",
+    "type": "password",
+  },
+  {
+    "default": "",
+    "key": "alldebridApiKey",
+    "title": "AllDebrid API Key",
+    "type": "password",
+  },
+  {
+    "default": "",
+    "key": "realdebridApiKey",
+    "title": "RealDebrid API Token",
+    "type": "password",
+  },
+  {
+    "key": "excludeResolution_2160p",
+    "title": "Exclude resolution 2160p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_1440p",
+    "title": "Exclude resolution 1440p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_1080p",
+    "title": "Exclude resolution 1080p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_720p",
+    "title": "Exclude resolution 720p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_576p",
+    "title": "Exclude resolution 576p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_480p",
+    "title": "Exclude resolution 480p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_360p",
+    "title": "Exclude resolution 360p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_240p",
+    "title": "Exclude resolution 240p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_144p",
+    "title": "Exclude resolution 144p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_Unknown",
+    "title": "Exclude resolution Unknown",
+    "type": "checkbox",
+  },
+]
+`;
+
+exports[`buildManifest has checked source with appropriate config 1`] = `
+[
+  {
+    "default": "checked",
+    "key": "de",
+    "title": "German 🇩🇪 (MeineCloud)",
+    "type": "checkbox",
+  },
+  {
+    "key": "es",
+    "title": "Castilian Spanish 🇪🇸 (VerHdLink)",
+    "type": "checkbox",
+  },
+  {
+    "key": "mx",
+    "title": "Latin American Spanish 🇲🇽 (VerHdLink)",
+    "type": "checkbox",
+  },
+  {
+    "key": "showErrors",
+    "title": "Show errors",
+    "type": "checkbox",
+  },
+  {
+    "default": "checked",
+    "key": "includeExternalUrls",
+    "title": "Include external URLs in results",
+    "type": "checkbox",
+  },
+  {
+    "default": "",
+    "key": "mediaFlowProxyUrl",
+    "title": "MediaFlow Proxy URL",
+    "type": "text",
+  },
+  {
+    "default": "",
+    "key": "mediaFlowProxyPassword",
+    "title": "MediaFlow Proxy Password",
+    "type": "password",
+  },
+  {
+    "default": "",
+    "key": "alldebridApiKey",
+    "title": "AllDebrid API Key",
+    "type": "password",
+  },
+  {
+    "default": "",
+    "key": "realdebridApiKey",
+    "title": "RealDebrid API Token",
+    "type": "password",
+  },
+  {
+    "key": "excludeResolution_2160p",
+    "title": "Exclude resolution 2160p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_1440p",
+    "title": "Exclude resolution 1440p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_1080p",
+    "title": "Exclude resolution 1080p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_720p",
+    "title": "Exclude resolution 720p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_576p",
+    "title": "Exclude resolution 576p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_480p",
+    "title": "Exclude resolution 480p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_360p",
+    "title": "Exclude resolution 360p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_240p",
+    "title": "Exclude resolution 240p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_144p",
+    "title": "Exclude resolution 144p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_Unknown",
+    "title": "Exclude resolution Unknown",
+    "type": "checkbox",
+  },
+  {
+    "key": "disableSource_meinecloud",
+    "title": "Disable source MeineCloud",
+    "type": "checkbox",
+  },
+  {
+    "key": "disableSource_verhdlink",
+    "title": "Disable source VerHdLink",
+    "type": "checkbox",
+  },
+]
+`;
+
+exports[`buildManifest has unchecked source without a config 1`] = `
+[
+  {
+    "key": "de",
+    "title": "German 🇩🇪 (MeineCloud)",
+    "type": "checkbox",
+  },
+  {
+    "key": "es",
+    "title": "Castilian Spanish 🇪🇸 (VerHdLink)",
+    "type": "checkbox",
+  },
+  {
+    "default": "checked",
+    "key": "multi",
+    "title": "Multi 🌐 (VixSrc)",
+    "type": "checkbox",
+  },
+  {
+    "key": "mx",
+    "title": "Latin American Spanish 🇲🇽 (VerHdLink)",
+    "type": "checkbox",
+  },
+  {
+    "key": "showErrors",
+    "title": "Show errors",
+    "type": "checkbox",
+  },
+  {
+    "key": "includeExternalUrls",
+    "title": "Include external URLs in results",
+    "type": "checkbox",
+  },
+  {
+    "default": "",
+    "key": "mediaFlowProxyUrl",
+    "title": "MediaFlow Proxy URL",
+    "type": "text",
+  },
+  {
+    "default": "",
+    "key": "mediaFlowProxyPassword",
+    "title": "MediaFlow Proxy Password",
+    "type": "password",
+  },
+  {
+    "default": "",
+    "key": "alldebridApiKey",
+    "title": "AllDebrid API Key",
+    "type": "password",
+  },
+  {
+    "default": "",
+    "key": "realdebridApiKey",
+    "title": "RealDebrid API Token",
+    "type": "password",
+  },
+  {
+    "key": "excludeResolution_2160p",
+    "title": "Exclude resolution 2160p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_1440p",
+    "title": "Exclude resolution 1440p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_1080p",
+    "title": "Exclude resolution 1080p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_720p",
+    "title": "Exclude resolution 720p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_576p",
+    "title": "Exclude resolution 576p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_480p",
+    "title": "Exclude resolution 480p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_360p",
+    "title": "Exclude resolution 360p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_240p",
+    "title": "Exclude resolution 240p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_144p",
+    "title": "Exclude resolution 144p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_Unknown",
+    "title": "Exclude resolution Unknown",
+    "type": "checkbox",
+  },
+  {
+    "key": "disableSource_meinecloud",
+    "title": "Disable source MeineCloud",
+    "type": "checkbox",
+  },
+  {
+    "key": "disableSource_verhdlink",
+    "title": "Disable source VerHdLink",
+    "type": "checkbox",
+  },
+  {
+    "key": "disableSource_vixsrc",
+    "title": "Disable source VixSrc",
+    "type": "checkbox",
+  },
+]
+`;
+
+exports[`buildManifest showErrors and includeExternalUrls are unchecked by default 1`] = `
+[
+  {
+    "key": "showErrors",
+    "title": "Show errors",
+    "type": "checkbox",
+  },
+  {
+    "key": "includeExternalUrls",
+    "title": "Include external URLs in results",
+    "type": "checkbox",
+  },
+  {
+    "default": "",
+    "key": "mediaFlowProxyUrl",
+    "title": "MediaFlow Proxy URL",
+    "type": "text",
+  },
+  {
+    "default": "",
+    "key": "mediaFlowProxyPassword",
+    "title": "MediaFlow Proxy Password",
+    "type": "password",
+  },
+  {
+    "default": "",
+    "key": "alldebridApiKey",
+    "title": "AllDebrid API Key",
+    "type": "password",
+  },
+  {
+    "default": "",
+    "key": "realdebridApiKey",
+    "title": "RealDebrid API Token",
+    "type": "password",
+  },
+  {
+    "key": "excludeResolution_2160p",
+    "title": "Exclude resolution 2160p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_1440p",
+    "title": "Exclude resolution 1440p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_1080p",
+    "title": "Exclude resolution 1080p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_720p",
+    "title": "Exclude resolution 720p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_576p",
+    "title": "Exclude resolution 576p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_480p",
+    "title": "Exclude resolution 480p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_360p",
+    "title": "Exclude resolution 360p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_240p",
+    "title": "Exclude resolution 240p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_144p",
+    "title": "Exclude resolution 144p",
+    "type": "checkbox",
+  },
+  {
+    "key": "excludeResolution_Unknown",
+    "title": "Exclude resolution Unknown",
+    "type": "checkbox",
+  },
+]
+`;

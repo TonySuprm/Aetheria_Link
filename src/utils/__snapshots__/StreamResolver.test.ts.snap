@@ -1,0 +1,630 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`handles source throwing non-NotFoundError 1`] = `
+{
+  "streams": [],
+}
+`;
+
+exports[`handles source throwing non-NotFoundError 2`] = `
+{
+  "streams": [
+    {
+      "externalUrl": "https://example.com",
+      "name": "Aetheria Link",
+      "title": "🔗 ThrowingSource
+❌ Request failed. Request-id: test.",
+    },
+  ],
+}
+`;
+
+exports[`resolve adds error info 1`] = `
+{
+  "streams": [
+    {
+      "behaviorHints": {
+        "bingeGroup": "aetheria-link-undefined-undefined-de",
+        "notWebReady": true,
+      },
+      "name": "Aetheria Link
+🇩🇪",
+      "title": "🔗 working1",
+      "url": "https://example6.com/",
+    },
+    {
+      "behaviorHints": {
+        "bingeGroup": "aetheria-link-undefined-undefined-de",
+        "notWebReady": true,
+      },
+      "name": "Aetheria Link
+🇩🇪",
+      "title": "🔗 working2",
+      "url": "https://example9.com/",
+    },
+    {
+      "behaviorHints": {
+        "bingeGroup": "aetheria-link-undefined-undefined-de",
+        "notWebReady": true,
+      },
+      "externalUrl": "https://example1.com/",
+      "name": "Aetheria Link
+🇩🇪",
+      "title": "🔗 hoster.com",
+    },
+  ],
+  "ttl": 1,
+}
+`;
+
+exports[`resolve adds error info 2`] = `
+{
+  "streams": [
+    {
+      "behaviorHints": {
+        "bingeGroup": "aetheria-link-undefined-undefined-de",
+        "notWebReady": true,
+      },
+      "externalUrl": "https://example14.com/",
+      "name": "Aetheria Link
+🇩🇪",
+      "title": "🔗 hoster.com
+❌ Request to example14.com failed with status 418 (I'm a tea pot). Request-id: test.",
+    },
+    {
+      "behaviorHints": {
+        "bingeGroup": "aetheria-link-undefined-undefined-de",
+        "notWebReady": true,
+      },
+      "externalUrl": "https://example13.com/",
+      "name": "Aetheria Link
+🇩🇪",
+      "title": "🔗 hoster.com
+❌ Remote server example13.com has issues. We can't fix this, please try later again.",
+    },
+    {
+      "behaviorHints": {
+        "bingeGroup": "aetheria-link-undefined-undefined-de",
+        "notWebReady": true,
+      },
+      "externalUrl": "https://example12.com/",
+      "name": "Aetheria Link
+🇩🇪",
+      "title": "🔗 hoster.com
+⏳ Request queue for example12.com is full. Please try again later or consider self-hosting.",
+    },
+    {
+      "behaviorHints": {
+        "bingeGroup": "aetheria-link-undefined-undefined-de",
+        "notWebReady": true,
+      },
+      "externalUrl": "https://example11.com/",
+      "name": "Aetheria Link
+🇩🇪",
+      "title": "🔗 hoster.com
+🐢 Request to example11.com timed out.",
+    },
+    {
+      "behaviorHints": {
+        "bingeGroup": "aetheria-link-undefined-undefined-de",
+        "notWebReady": true,
+      },
+      "externalUrl": "https://example10.com/",
+      "name": "Aetheria Link
+🇩🇪",
+      "title": "🔗 hoster.com
+❌ Request failed. Request-id: test.",
+    },
+    {
+      "behaviorHints": {
+        "bingeGroup": "aetheria-link-undefined-undefined-de",
+        "notWebReady": true,
+      },
+      "externalUrl": "https://example8.com/",
+      "name": "Aetheria Link
+🇩🇪",
+      "title": "🔗 hoster.com
+🚦 Too many recent timeouts when requesting example8.com. Please try again later.",
+    },
+    {
+      "behaviorHints": {
+        "bingeGroup": "aetheria-link-undefined-undefined-de",
+        "notWebReady": true,
+      },
+      "externalUrl": "https://example7.com/",
+      "name": "Aetheria Link
+🇩🇪",
+      "title": "🔗 hoster.com
+🚦 Request to example7.com was rate-limited. Please try again later or consider self-hosting.",
+    },
+    {
+      "behaviorHints": {
+        "bingeGroup": "aetheria-link-undefined-undefined-de",
+        "notWebReady": true,
+      },
+      "externalUrl": "https://example5.com/",
+      "name": "Aetheria Link
+🇩🇪",
+      "title": "🔗 hoster.com
+⚠️ Request to example5.com was blocked. Reason: unknown",
+    },
+    {
+      "behaviorHints": {
+        "bingeGroup": "aetheria-link-undefined-undefined-de",
+        "notWebReady": true,
+      },
+      "externalUrl": "https://example4.com/",
+      "name": "Aetheria Link
+🇩🇪",
+      "title": "🔗 hoster.com
+⚠️ MediaFlow Proxy authentication failed. Please set the correct password.",
+    },
+    {
+      "behaviorHints": {
+        "bingeGroup": "aetheria-link-undefined-undefined-de",
+        "notWebReady": true,
+      },
+      "externalUrl": "https://example3.com/",
+      "name": "Aetheria Link
+🇩🇪",
+      "title": "🔗 hoster.com
+⚠️ Request to example3.com was blocked. Reason: cloudflare_censor",
+    },
+    {
+      "behaviorHints": {
+        "bingeGroup": "aetheria-link-undefined-undefined-de",
+        "notWebReady": true,
+      },
+      "externalUrl": "https://example2.com/",
+      "name": "Aetheria Link
+🇩🇪",
+      "title": "🔗 hoster.com
+⚠️ Request to example2.com was blocked. Reason: cloudflare_challenge",
+    },
+    {
+      "behaviorHints": {
+        "bingeGroup": "aetheria-link-undefined-undefined-de",
+        "notWebReady": true,
+      },
+      "name": "Aetheria Link
+🇩🇪",
+      "title": "🔗 working1",
+      "url": "https://example6.com/",
+    },
+    {
+      "behaviorHints": {
+        "bingeGroup": "aetheria-link-undefined-undefined-de",
+        "notWebReady": true,
+      },
+      "name": "Aetheria Link
+🇩🇪",
+      "title": "🔗 working2",
+      "url": "https://example9.com/",
+    },
+    {
+      "behaviorHints": {
+        "bingeGroup": "aetheria-link-undefined-undefined-de",
+        "notWebReady": true,
+      },
+      "externalUrl": "https://example1.com/",
+      "name": "Aetheria Link
+🇩🇪",
+      "title": "🔗 hoster.com",
+    },
+  ],
+  "ttl": 1,
+}
+`;
+
+exports[`resolve ignores not found errors 1`] = `
+{
+  "streams": [],
+  "ttl": 900000,
+}
+`;
+
+exports[`resolve keeps fallback sources if needed 1`] = `
+[
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-fallback-only-undefined-multi",
+      "notWebReady": true,
+    },
+    "name": "Aetheria Link
+🌐",
+    "title": "🔗 HubCloud from FallbackOnly",
+    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubcloud.cx%2Fsome-link",
+  },
+]
+`;
+
+exports[`resolve returns empty array if no source found anything 1`] = `
+{
+  "streams": [],
+  "ttl": 900000,
+}
+`;
+
+exports[`resolve returns empty array if no source supported the type 1`] = `
+{
+  "streams": [],
+  "ttl": 900000,
+}
+`;
+
+exports[`resolve returns info as stream if no sources were configured 1`] = `
+{
+  "streams": [
+    {
+      "externalUrl": "http://localhost/",
+      "name": "Aetheria Link",
+      "title": "⚠️ No sources found. Please re-configure the plugin.",
+    },
+  ],
+}
+`;
+
+exports[`resolve returns sorted results 1`] = `
+[
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-meinecloud-dropload-de",
+      "notWebReady": true,
+      "proxyHeaders": {
+        "request": {
+          "Referer": "https://meinecloud.click",
+        },
+      },
+      "videoSize": 1395864371,
+    },
+    "name": "Aetheria Link
+🇩🇪
+1080p",
+    "title": "des-teufels-bad-2024
+💾 1.3 GB
+🔗 Dropload from MeineCloud",
+    "url": "https://srv34.dropload.io/hls2/01/00197/lyo2h1snpe5c_h/master.m3u8?t=MZSqs3F338ocbM2eTs8X23s585dWcYuilGrNNcidNas&s=1749846846&e=14400&f=987607&srv=srv27&i=0.0&sp=0&ii=50.99.15.93&p1=srv27&p2=srv27",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-mostraguarda-dropload-it",
+      "notWebReady": true,
+      "proxyHeaders": {
+        "request": {
+          "Referer": "https://mostraguarda.stream",
+        },
+      },
+      "videoSize": 1181116006,
+    },
+    "name": "Aetheria Link
+🇮🇹
+720p",
+    "title": "the-devils-bath-2024-sd-sub-ita
+💾 1.1 GB
+🔗 Dropload from MostraGuarda",
+    "url": "https://srv34.dropload.io/hls2/01/00200/xsr90y2ltdyx_h/master.m3u8?t=rsJMeR8rtWZxFi_3DOdlt98U0rvAMincCe4-awDQzHE&s=1749846846&e=14400&f=1004116&srv=srv24&i=0.0&sp=0&ii=50.99.15.93&p1=srv24&p2=srv24",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-meinecloud-undefined-de",
+      "notWebReady": true,
+      "proxyHeaders": {
+        "request": {
+          "Referer": "https://meinecloud.click",
+        },
+      },
+    },
+    "name": "Aetheria Link
+🇩🇪",
+    "title": "🔗 Mixdrop from MeineCloud",
+    "url": "http://localhost/%7B%22de%22%3A%22on%22%2C%22it%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fmixdrop.ag%2Fe%2F3nzwveprim63or6",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-mostraguarda-undefined-it",
+      "notWebReady": true,
+      "proxyHeaders": {
+        "request": {
+          "Referer": "https://mostraguarda.stream",
+        },
+      },
+    },
+    "name": "Aetheria Link
+🇮🇹",
+    "title": "🔗 Mixdrop from MostraGuarda",
+    "url": "http://localhost/%7B%22de%22%3A%22on%22%2C%22it%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fmixdrop.ag%2Fe%2Fvk196d6xfzwwo1",
+  },
+]
+`;
+
+exports[`resolve returns sorted results 2`] = `
+[
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-meinecloud-dropload-de",
+      "notWebReady": true,
+      "proxyHeaders": {
+        "request": {
+          "Referer": "https://meinecloud.click",
+        },
+      },
+      "videoSize": 1395864371,
+    },
+    "name": "Aetheria Link
+🇩🇪
+1080p",
+    "title": "des-teufels-bad-2024
+💾 1.3 GB
+🔗 Dropload from MeineCloud",
+    "url": "https://srv34.dropload.io/hls2/01/00197/lyo2h1snpe5c_h/master.m3u8?t=MZSqs3F338ocbM2eTs8X23s585dWcYuilGrNNcidNas&s=1749846846&e=14400&f=987607&srv=srv27&i=0.0&sp=0&ii=50.99.15.93&p1=srv27&p2=srv27",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-mostraguarda-dropload-it",
+      "notWebReady": true,
+      "proxyHeaders": {
+        "request": {
+          "Referer": "https://mostraguarda.stream",
+        },
+      },
+      "videoSize": 1181116006,
+    },
+    "name": "Aetheria Link
+🇮🇹
+720p",
+    "title": "the-devils-bath-2024-sd-sub-ita
+💾 1.1 GB
+🔗 Dropload from MostraGuarda",
+    "url": "https://srv34.dropload.io/hls2/01/00200/xsr90y2ltdyx_h/master.m3u8?t=rsJMeR8rtWZxFi_3DOdlt98U0rvAMincCe4-awDQzHE&s=1749846846&e=14400&f=1004116&srv=srv24&i=0.0&sp=0&ii=50.99.15.93&p1=srv24&p2=srv24",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-meinecloud-undefined-de",
+      "notWebReady": true,
+      "proxyHeaders": {
+        "request": {
+          "Referer": "https://meinecloud.click",
+        },
+      },
+    },
+    "name": "Aetheria Link
+🇩🇪",
+    "title": "🔗 Mixdrop from MeineCloud",
+    "url": "http://localhost/%7B%22de%22%3A%22on%22%2C%22it%22%3A%22on%22%2C%22includeExternalUrls%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fmixdrop.ag%2Fe%2F3nzwveprim63or6",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-mostraguarda-undefined-it",
+      "notWebReady": true,
+      "proxyHeaders": {
+        "request": {
+          "Referer": "https://mostraguarda.stream",
+        },
+      },
+    },
+    "name": "Aetheria Link
+🇮🇹",
+    "title": "🔗 Mixdrop from MostraGuarda",
+    "url": "http://localhost/%7B%22de%22%3A%22on%22%2C%22it%22%3A%22on%22%2C%22includeExternalUrls%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fmixdrop.ag%2Fe%2Fvk196d6xfzwwo1",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-meinecloud-external-de",
+      "notWebReady": true,
+      "proxyHeaders": {
+        "request": {
+          "Referer": "https://meinecloud.click",
+        },
+      },
+    },
+    "externalUrl": "https://supervideo.cc/e/q7i0sw1oytw3",
+    "name": "Aetheria Link
+🇩🇪
+⚠️ external",
+    "title": "🔗 supervideo.cc from MeineCloud",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-mostraguarda-external-it",
+      "notWebReady": true,
+      "proxyHeaders": {
+        "request": {
+          "Referer": "https://mostraguarda.stream",
+        },
+      },
+    },
+    "externalUrl": "https://supervideo.cc/e/6vri8jyhla3n",
+    "name": "Aetheria Link
+🇮🇹
+⚠️ external",
+    "title": "🔗 supervideo.cc from MostraGuarda",
+  },
+]
+`;
+
+exports[`resolve returns source errors as stream 1`] = `
+{
+  "streams": [],
+  "ttl": 900000,
+}
+`;
+
+exports[`resolve returns source errors as stream 2`] = `
+{
+  "streams": [],
+  "ttl": 900000,
+}
+`;
+
+exports[`resolve skips fallback sources if possible 1`] = `
+[
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-4khdhub-undefined-multi_en_hi",
+      "notWebReady": true,
+      "videoSize": 22430466703,
+    },
+    "name": "Aetheria Link
+🌐 🇺🇸 🇮🇳
+2160p",
+    "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.2160p.NF.WEB-DL.DUAL.DDP5.1.Atmos.DV.HDR.H.265-4kHDHub.Com.mkv
+💾 20.89 GB
+🔗 HubCloud from 4KHDHub",
+    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubcloud.foo%2Fdrive%2Ftskphjtms4ovpkl",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-4khdhub-undefined-multi_en_hi",
+      "notWebReady": true,
+      "videoSize": 22430466703,
+    },
+    "name": "Aetheria Link
+🌐 🇺🇸 🇮🇳
+2160p",
+    "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.2160p.NF.WEB-DL.DUAL.DDP5.1.Atmos.DV.HDR.H.265-4kHDHub.Com.mkv
+💾 20.89 GB
+🔗 HubCloud from 4KHDHub",
+    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubdrive.space%2Ffile%2F7320131496",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-4khdhub-undefined-multi_en_hi",
+      "notWebReady": true,
+      "videoSize": 19295140577,
+    },
+    "name": "Aetheria Link
+🌐 🇺🇸 🇮🇳
+2160p",
+    "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.2160p.NF.WEB-DL.DUAL.DDP5.1.Atmos.H.265-4kHDHub.Com.mkv
+💾 17.97 GB
+🔗 HubCloud from 4KHDHub",
+    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubcloud.foo%2Fdrive%2Fa55vjuuwj4vbtha",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-4khdhub-undefined-multi_en_hi",
+      "notWebReady": true,
+      "videoSize": 19295140577,
+    },
+    "name": "Aetheria Link
+🌐 🇺🇸 🇮🇳
+2160p",
+    "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.2160p.NF.WEB-DL.DUAL.DDP5.1.Atmos.H.265-4kHDHub.Com.mkv
+💾 17.97 GB
+🔗 HubCloud from 4KHDHub",
+    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubdrive.space%2Ffile%2F17461174001",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-4khdhub-undefined-multi_en_hi",
+      "notWebReady": true,
+      "videoSize": 10018011217,
+    },
+    "name": "Aetheria Link
+🌐 🇺🇸 🇮🇳
+1080p",
+    "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.1080p.NF.WEB-DL.Hindi.DDP5.1.Atmos-English.DDP5.1.Atmos.H.265-4kHdHub.Com.mkv
+💾 9.33 GB
+🔗 HubCloud from 4KHDHub",
+    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubcloud.foo%2Fdrive%2F4bttg4jurgo151w",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-4khdhub-undefined-multi_en_hi",
+      "notWebReady": true,
+      "videoSize": 10018011217,
+    },
+    "name": "Aetheria Link
+🌐 🇺🇸 🇮🇳
+1080p",
+    "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.1080p.NF.WEB-DL.Hindi.DDP5.1.Atmos-English.DDP5.1.Atmos.H.265-4kHdHub.Com.mkv
+💾 9.33 GB
+🔗 HubCloud from 4KHDHub",
+    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubdrive.space%2Ffile%2F4163119205",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-4khdhub-undefined-multi_en_hi",
+      "notWebReady": true,
+      "videoSize": 9985798963,
+    },
+    "name": "Aetheria Link
+🌐 🇺🇸 🇮🇳
+1080p",
+    "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.1080p.NF.WEB-DL.Hindi.DDP5.1.Atmos-English.DDP5.1.Atmos.H.264-4kHdHub.Com.mkv
+💾 9.3 GB
+🔗 HubCloud from 4KHDHub",
+    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubcloud.foo%2Fdrive%2Fxoun4ifeynizfs9",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-4khdhub-undefined-multi_en_hi",
+      "notWebReady": true,
+      "videoSize": 9985798963,
+    },
+    "name": "Aetheria Link
+🌐 🇺🇸 🇮🇳
+1080p",
+    "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.1080p.NF.WEB-DL.Hindi.DDP5.1.Atmos-English.DDP5.1.Atmos.H.264-4kHdHub.Com.mkv
+💾 9.3 GB
+🔗 HubCloud from 4KHDHub",
+    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubdrive.space%2Ffile%2F7057184163",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-4khdhub-undefined-multi_en_hi",
+      "notWebReady": true,
+      "videoSize": 5712306503,
+    },
+    "name": "Aetheria Link
+🌐 🇺🇸 🇮🇳
+1080p",
+    "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.1080p.NF.WEB-DL.Hindi.DDP5.1.Atmos-English.DDP5.1.Atmos.HDR-DV.H.265-4kHdHub.Com.mkv
+💾 5.32 GB
+🔗 HubCloud from 4KHDHub",
+    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubcloud.foo%2Fdrive%2F6w6tm1hfcsmshwk",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-4khdhub-undefined-multi_en_hi",
+      "notWebReady": true,
+      "videoSize": 5712306503,
+    },
+    "name": "Aetheria Link
+🌐 🇺🇸 🇮🇳
+1080p",
+    "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.1080p.NF.WEB-DL.Hindi.DDP5.1.Atmos-English.DDP5.1.Atmos.HDR-DV.H.265-4kHdHub.Com.mkv
+💾 5.32 GB
+🔗 HubCloud from 4KHDHub",
+    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubdrive.space%2Ffile%2F5520821952",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-4khdhub-undefined-multi_en_hi",
+      "notWebReady": true,
+      "videoSize": 1374389534,
+    },
+    "name": "Aetheria Link
+🌐 🇺🇸 🇮🇳
+1080p",
+    "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.1080p.NF.WEB-DL.Hindi.AAC5.1-English.AAC5.1.AV1-4kHdHub.Com.mkv
+💾 1.28 GB
+🔗 HubCloud from 4KHDHub",
+    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubcloud.foo%2Fdrive%2Fmvsevbmwskarnmy",
+  },
+  {
+    "behaviorHints": {
+      "bingeGroup": "aetheria-link-4khdhub-undefined-multi_en_hi",
+      "notWebReady": true,
+      "videoSize": 1374389534,
+    },
+    "name": "Aetheria Link
+🌐 🇺🇸 🇮🇳
+1080p",
+    "title": "Wake.Up.Dead.Man.A.Knives.Out.Mystery.2025.1080p.NF.WEB-DL.Hindi.AAC5.1-English.AAC5.1.AV1-4kHdHub.Com.mkv
+💾 1.28 GB
+🔗 HubCloud from 4KHDHub",
+    "url": "http://localhost/%7B%22multi%22%3A%22on%22%2C%22en%22%3A%22on%22%7D/extract/?index=0&url=https%3A%2F%2Fhubdrive.space%2Ffile%2F3030182308",
+  },
+]
+`;

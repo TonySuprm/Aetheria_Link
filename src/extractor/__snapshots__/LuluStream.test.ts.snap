@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`LuluStream no such file 1`] = `
+[
+  {
+    "error": [Error: Error: No fixture found at "E:\\New Coding Projects\\1 Aetheria Link  Gemini\\src\\extractor/__fixtures__/LuluStream/https_lulustream.comeuthq0o0sljnx".],
+    "format": "unknown",
+    "isExternal": true,
+    "label": "LuluStream (MFP)",
+    "meta": {
+      "extractorId": "lulustream",
+    },
+    "ttl": 0,
+    "url": "https://lulustream.com/e/uthq0o0sljnx",
+  },
+]
+`;
+
+exports[`LuluStream streamhihi 1`] = `[]`;
+
+exports[`LuluStream streamhihi d 1`] = `[]`;
