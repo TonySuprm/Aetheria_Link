@@ -458,11 +458,20 @@ export class StreamResolver {
   private getProbeTarget(urlResult: UrlResult): { url: URL; meta?: Meta; requestHeaders?: Record<string, string> } | undefined {
     const path = urlResult.url.pathname.toLowerCase();
     let targetHref: string | null = null;
+    let extractedHeaders: Record<string, string> | undefined = undefined;
 
     if (path.includes('/extract/')) {
       targetHref = urlResult.url.searchParams.get('url');
-    } else if (path.endsWith('/extractor/video')) {
+    } else if (path.endsWith('/extractor/video') || path.includes('/proxy/hls/') || path.includes('/proxy/stream') || path.includes('/proxy/mpd/')) {
       targetHref = urlResult.url.searchParams.get('d');
+      if (targetHref) {
+        extractedHeaders = {};
+        for (const [key, value] of urlResult.url.searchParams.entries()) {
+          if (key.toLowerCase().startsWith('h_')) {
+            extractedHeaders[key.substring(2)] = value;
+          }
+        }
+      }
     }
 
     if (targetHref === null) {
@@ -478,7 +487,12 @@ export class StreamResolver {
 
     const target: { url: URL; meta?: Meta; requestHeaders?: Record<string, string> } = { url: targetUrl };
     if (urlResult.meta) target.meta = urlResult.meta;
-    if (urlResult.requestHeaders) target.requestHeaders = urlResult.requestHeaders;
+    
+    const combinedHeaders = { ...(urlResult.requestHeaders ?? {}), ...(extractedHeaders ?? {}) };
+    if (Object.keys(combinedHeaders).length > 0) {
+      target.requestHeaders = combinedHeaders;
+    }
+
     return target;
   }
 
@@ -486,7 +500,7 @@ export class StreamResolver {
     if (urlResult.error || urlResult.isExternal || urlResult.ytId) return false;
     const path = urlResult.url.pathname.toLowerCase();
     // Internal extract proxies carry the real hoster URL in a query parameter.
-    if (path.includes('/extract/') || path.endsWith('/extractor/video')) {
+    if (path.includes('/extract/') || path.endsWith('/extractor/video') || path.includes('/proxy/hls/') || path.includes('/proxy/stream') || path.includes('/proxy/mpd/')) {
       return this.getProbeTarget(urlResult) !== undefined;
     }
     if (PROBEABLE_PATH_RE.test(path)) return true;
