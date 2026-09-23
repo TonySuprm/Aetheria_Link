@@ -45,5 +45,7 @@ if [ -z "${TMDB_ACCESS_TOKEN}" ]; then
   echo "[aetheria] WARNING: TMDB_ACCESS_TOKEN is not set. Most sources will not resolve IDs."
 fi
 
+echo "[aetheria] running supervisord status:"
+supervisorctl status || true
 echo "[aetheria] starting addon on port $PORT..."
 exec npm start

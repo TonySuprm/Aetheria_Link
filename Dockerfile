@@ -3,11 +3,31 @@
 # service starts with "everything" using supervisord.
 
 # ---------------------------------------------------------------------------
-# Stage 1: Pull the pre-built MediaFlow Proxy binary image.
-# This avoids compiling the heavy Rust/BoringSSL stack on every deploy.
-# Image built from: ./mediaflow-proxy/Dockerfile
+# Stage 1: Build MediaFlow Proxy from source
+# This guarantees glibc/libstdc++ compatibility with the final image.
+# Base + dependency list mirror mediaflow-proxy/Dockerfile (the recipe used
+# for the working prebuilt image): `extractors` pulls rquest -> boring-sys2,
+# which statically compiles BoringSSL (cmake/ninja/golang) and bindgen needs
+# libclang.
 # ---------------------------------------------------------------------------
-FROM tonysupr/mediaflow-proxy-light:latest AS mediaflow
+FROM rust:1.95-slim-bookworm AS mediaflow
+WORKDIR /build
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        pkg-config \
+        build-essential \
+        cmake \
+        ninja-build \
+        perl \
+        python3 \
+        golang-go \
+        git \
+        clang \
+        libclang-dev \
+        && rm -rf /var/lib/apt/lists/*
+
+COPY mediaflow-proxy/ .
+RUN cargo build --release
 
 # ---------------------------------------------------------------------------
 # Stage 2: Final image based on the official FlareSolverr image.
@@ -33,7 +53,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the MediaFlow Proxy binary and project runtime config.
-COPY --from=mediaflow /app/mediaflow-proxy-light /usr/local/bin/mediaflow-proxy-light
+COPY --from=mediaflow /build/target/release/mediaflow-proxy-light /usr/local/bin/mediaflow-proxy-light
 RUN chmod +x /usr/local/bin/mediaflow-proxy-light
 COPY mediaflow-config.toml /app/mediaflow-config.toml
 

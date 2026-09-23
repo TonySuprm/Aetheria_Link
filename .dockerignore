@@ -16,10 +16,19 @@ backup 1
 !eslint.config.mjs
 
 # External sidecar submodule/repo checkouts are not used in the bundled image.
-# FlareSolverr is pulled from the same base image; MediaFlow Proxy is copied from
-# the prebuilt tonysupr/mediaflow-proxy-light stage.
+# FlareSolverr is pulled from the same base image.
 /FlareSolverr/
-/mediaflow-proxy/
+
+# The MFP Rust source is COPYed into the image and built from source; keep
+# only the heavy local build output out of the context.
+/mediaflow-proxy/target/
+# static/ assets (web-ui) are compile-time embedded by rust-embed, so they
+# must survive the global *.html / *.png ignores above.
+!mediaflow-proxy/static/*.html
+!mediaflow-proxy/static/*.png
+!mediaflow-proxy/static/*.js
+!mediaflow-proxy/static/*.css
+!mediaflow-proxy/static/*.svg
 
 # Session/local artifacts
 logs/
