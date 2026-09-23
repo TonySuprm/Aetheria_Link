@@ -176,7 +176,7 @@ export class MediaFlowProxyController {
 
     upstream.on('error', (err) => {
       if (!res.headersSent) {
-        this.logger.warn(`MediaFlowProxy upstream error: ${err.message}`);
+        this.logger.warn(`MediaFlowProxy upstream error: ${(err as NodeJS.ErrnoException).code ?? ''} ${err.message}`);
         res.status(502).end('MediaFlow proxy upstream error');
       } else {
         res.destroy();
