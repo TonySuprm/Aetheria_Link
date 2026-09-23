@@ -1,9 +1,12 @@
+import { Context } from '../types';
 import { createTestContext } from '../test';
 import { FetcherMock } from './FetcherMock';
 import {
   buildMediaFlowProxyExtractorRedirectUrl,
   buildMediaFlowProxyExtractorStreamUrl,
   buildMediaFlowProxyHlsUrl,
+  buildMediaFlowProxyStreamUrl,
+  isEmbeddedMediaFlowProxy,
   supportsMediaFlowProxy,
 } from './media-flow-proxy';
 
@@ -11,6 +14,12 @@ const ctxWithProxy = createTestContext({ mediaFlowProxyUrl: 'proxy.example.com',
 const ctxWithProxyNoPassword = createTestContext({ mediaFlowProxyUrl: 'proxy.example.com' });
 const ctxWithoutProxy = createTestContext();
 const fetcher = new FetcherMock(`${__dirname}/__fixtures__/media-flow-proxy`);
+
+const embeddedCtx = (mediaFlowProxyUrl: string): Context => ({
+  hostUrl: new URL('https://public.example'),
+  id: 'test',
+  config: { mediaFlowProxyUrl, mediaFlowProxyPassword: 'secret' },
+});
 
 describe('supportsMediaFlowProxy', () => {
   test('returns true when mediaFlowProxyUrl is set', () => {
@@ -73,5 +82,40 @@ describe('api_password handling', () => {
   test('buildMediaFlowProxyHlsUrl omits api_password when not set', () => {
     const url = buildMediaFlowProxyHlsUrl(ctxWithProxyNoPassword, new URL('https://example.com/stream.m3u8'));
     expect(url.searchParams.has('api_password')).toBe(false);
+  });
+});
+
+describe('embedded (loopback) proxy -> public host rewrite', () => {
+  test('isEmbeddedMediaFlowProxy detects loopback hosts', () => {
+    expect(isEmbeddedMediaFlowProxy('http://localhost:8889')).toBe(true);
+    expect(isEmbeddedMediaFlowProxy('127.0.0.1:8889')).toBe(true);
+    expect(isEmbeddedMediaFlowProxy('http://0.0.0.0:8889')).toBe(true);
+    expect(isEmbeddedMediaFlowProxy('https://mediaflow.example.com')).toBe(false);
+    expect(isEmbeddedMediaFlowProxy(undefined)).toBe(false);
+  });
+
+  test('buildMediaFlowProxyHlsUrl uses the public host for the embedded proxy', () => {
+    const url = buildMediaFlowProxyHlsUrl(embeddedCtx('http://localhost:8889'), new URL('https://example.com/stream.m3u8'));
+    expect(url.origin).toBe('https://public.example');
+    expect(url.pathname).toBe('/proxy/hls/manifest.m3u8');
+    expect(url.searchParams.get('d')).toBe('https://example.com/stream.m3u8');
+  });
+
+  test('buildMediaFlowProxyStreamUrl uses the public host for the embedded proxy', () => {
+    const url = buildMediaFlowProxyStreamUrl(embeddedCtx('127.0.0.1:8889'), new URL('https://example.com/video.mp4'));
+    expect(url.origin).toBe('https://public.example');
+    expect(url.pathname).toBe('/proxy/stream');
+  });
+
+  test('buildMediaFlowProxyExtractorRedirectUrl uses the public host for the embedded proxy', () => {
+    const url = buildMediaFlowProxyExtractorRedirectUrl(embeddedCtx('http://localhost:8889'), 'doodstream', new URL('https://doodstream.com/d/abc'), { Referer: 'https://ref.com' });
+    expect(url.origin).toBe('https://public.example');
+    expect(url.pathname).toBe('/extractor/video');
+    expect(url.searchParams.get('redirect_stream')).toBe('true');
+  });
+
+  test('external (public) proxy config keeps its own origin', () => {
+    const url = buildMediaFlowProxyHlsUrl(ctxWithProxy, new URL('https://example.com/stream.m3u8'));
+    expect(url.origin).toBe('http://proxy.example.com');
   });
 });

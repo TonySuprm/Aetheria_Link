@@ -9,7 +9,7 @@ import express, { NextFunction, Request, Response } from 'express';
 // eslint-disable-next-line import/no-named-as-default
 import rateLimit from 'express-rate-limit';
 import winston from 'winston';
-import { ConfigureController, ExtractController, ManifestController, MegaProxyController, RelayController, StreamController } from './controller';
+import { ConfigureController, ExtractController, ManifestController, MediaFlowProxyController, MegaProxyController, RelayController, StreamController } from './controller';
 import { BlockedError, logErrorAndReturnNiceString } from './error';
 import { createExtractors, ExtractorRegistry } from './extractor';
 import { createSources, Source } from './source';
@@ -187,7 +187,10 @@ addon.get('/', (_req, res) => {
 });
 
 if (envIsProd()) {
-  addon.use(rateLimit({ windowMs: 60 * 1000, limit: 30 }));
+  // The MediaFlow Proxy relay (/proxy/*, /extractor/*, /_token_/*) streams
+  // video: a player easily exceeds 30 segment/playlist requests per minute,
+  // so exempt it.
+  addon.use(rateLimit({ windowMs: 60 * 1000, limit: 30, skip: (req) => req.path.startsWith('/proxy/') || req.path.startsWith('/extractor/') || req.path.startsWith('/_token_') }));
 }
 
 addon.use((_req: Request, res: Response, next: NextFunction) => {
@@ -209,6 +212,7 @@ addon.use('/', (new ExtractController(logger, fetcher, extractorRegistry)).route
 addon.use('/', (new ConfigureController(sources, extractors)).router);
 addon.use('/', (new ManifestController(sources, extractors)).router);
 addon.use('/', (new RelayController(logger)).router);
+addon.use('/', (new MediaFlowProxyController(logger)).router);
 addon.use('/', (new MegaProxyController(logger)).router);
 
 const streamResolver = new StreamResolver(logger, extractorRegistry);
