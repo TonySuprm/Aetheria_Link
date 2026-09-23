@@ -317,7 +317,8 @@ export class StreamResolver {
           // REMUX) have different filenames and are NOT deduped.
           let filename = '';
           try {
-            const hosterUrlStr = urlResult.url.searchParams.get('url');
+            const hosterUrlStr = urlResult.url.searchParams.get('url')
+              || urlResult.url.searchParams.get('d');
             const hosterUrl = hosterUrlStr ? new URL(hosterUrlStr) : urlResult.url;
             filename = normalizeFilename(hosterUrl);
           } catch { /* skip filename dedup for non-extract URLs */ }

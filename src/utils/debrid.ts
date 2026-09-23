@@ -315,7 +315,7 @@ export const normalizeFilename = (url: URL): string => {
     .replace(/\.\w{2,4}$/i, '');
   
   const lowerFilename = filename.toLowerCase();
-  const genericNames = ['playlist', 'index', 'master', 'video', 'stream', 'chunklist'];
+  const genericNames = ['playlist', 'index', 'master', 'manifest', 'video', 'stream', 'chunklist'];
   if (genericNames.includes(lowerFilename)) {
     return ''; // Do not dedup by generic streaming manifests/filenames
   }
