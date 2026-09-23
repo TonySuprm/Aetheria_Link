@@ -1,0 +1,10 @@
+{
+  "id": "xfa1234",
+  "title": "Numeric qualities only (no auto master)",
+  "qualities": {
+    "540": [ { "type": "application/vnd.lumberjack.manifest", "url": "https://cdn.example.com/fx-540.lumberjack" } ],
+    "720": [ { "type": "application/x-mpegURL", "url": "https://cdndirector.dailymotion.com/cdn/m/fx-720.m3u8?sec=FAKE720" } ],
+    "1080": [ { "type": "application/x-mpegURL", "url": "https://cdndirector.dailymotion.com/cdn/m/fx-1080.m3u8?sec=FAKE1080" } ],
+    "mobile": [ { "type": "application/x-mpegURL", "url": "https://cdndirector.dailymotion.com/cdn/m/fx-mobile.m3u8?sec=FAKEMOBILE" } ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "url": "https://www.dailymotion.com/video/xbbtrw2",
+  "id": "xbbtrw2",
+  "title": "Top 5 Classical Orchestral CDs For Relaxation",
+  "duration": 252,
+  "qualities": {
+    "auto": [
+      { "type": "application/x-mpegURL", "url": "https://cdndirector.dailymotion.com/cdn/manifest/video/xbbtrw2.m3u8?sec=FAKETOKEN123&dmTs=997274" }
+    ],
+    "1080": [
+      { "type": "application/x-mpegURL", "url": "https://cdndirector.dailymotion.com/cdn/manifest/video/xbbtrw2-1080.m3u8?sec=FAKETOKEN456" }
+    ]
+  }
+}

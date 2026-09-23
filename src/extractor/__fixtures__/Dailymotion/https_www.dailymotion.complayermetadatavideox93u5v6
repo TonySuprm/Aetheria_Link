@@ -1,0 +1,10 @@
+{
+  "error": { "code": "DM007", "message": "Can't find object video" },
+  "url": "https://www.dailymotion.com/video/x93u5v6",
+  "id": "x93u5v6",
+  "qualities": {
+    "auto": [
+      { "type": "application/vnd.dailymotion.metadata", "url": "https://www.dailymotion.com/player/metadata/x93u5v6" }
+    ]
+  }
+}

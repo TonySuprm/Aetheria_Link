@@ -1,0 +1,1 @@
+Fetcher error: 403: Forbidden (simulating a Fetcher failure so the direct-https fallback path runs)
