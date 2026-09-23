@@ -7,12 +7,10 @@ exports[`MovieBox handle movie avatar 1`] = `
       "countryCodes": [
         "multi",
       ],
-      "referer": "https://videodownloader.site/",
+      "referer": "https://themoviebox.org/",
       "title": "Avatar (2009)",
     },
-    "url": "https://h5-api.aoneroom.com/wefeed-h5api-bff/subject/download?subjectId=8906247916759695608&se=0&ep=0&detailPath=avatar-WLDIi21IUBa",
+    "url": "https://themoviebox.org/moviesDetail/avatar-WLDIi21IUBa",
   },
 ]
 `;
-
-exports[`MovieBox handle tv breaking bad s1e1 1`] = `[]`;

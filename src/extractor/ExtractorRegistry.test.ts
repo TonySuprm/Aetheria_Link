@@ -67,13 +67,13 @@ describe('ExtractorRegistry', () => {
   });
 
   test('returns external URLs if enabled by config', async () => {
-    const urlResult = await extractorRegistry.handle({ ...ctx, config: { ...ctx.config, includeExternalUrls: 'on' } }, new URL('https://mixdrop.ag/e/3nzwveprim63or6'));
+    const urlResult = await extractorRegistry.handle({ ...ctx, config: { ...ctx.config, includeExternalUrls: 'on' } }, new URL('https://externalexample.test/e/abc123'));
 
     expect(urlResult).toMatchSnapshot();
   });
 
   test('does not return external URLs by default', async () => {
-    const urlResult = await extractorRegistry.handle(ctx, new URL('https://mixdrop.ag/e/l7v73zqrfdj19z'));
+    const urlResult = await extractorRegistry.handle(ctx, new URL('https://externalexample.test/e/abc123'));
 
     expect(urlResult).toStrictEqual([]);
   });
@@ -207,7 +207,7 @@ describe('ExtractorRegistry', () => {
       expect(urlResults[0]?.url.hostname).toBe('cdn.test');
     });
 
-    test('returns /extract/ URLs from lazy cache for non-lazy extractor when urlResultCache expires', async () => {
+    test('non-lazy extractor re-extracts instead of serving stale lazy cache when urlResultCache expires', async () => {
       const mockExtractor = new MockHubExtractor(new FetcherMock(`${__dirname}`), logger);
       const registry = new ExtractorRegistry(logger, [mockExtractor]);
 
@@ -222,11 +222,14 @@ describe('ExtractorRegistry', () => {
       const cacheKey = `mockhub_https://mockcloud.test/same-file`;
       await registry['urlResultCache'].delete(cacheKey);
 
-      // Second call with allowLazy=true — lazyUrlResultCache still fresh, urlResultCache expired
+      // Second call with allowLazy=true — the lazy cache is only consulted for lazy
+      // extractors: a non-lazy extractor's results carry short-lived tokens, so serving
+      // up to 24h-old cached results would break playback. It re-extracts instead and
+      // returns the direct (non-/extract/) URL.
       const urlResults = await registry.handle(ctx, url, meta, true);
-      expect(mockExtractor.extractCount).toBe(1); // no re-extraction
+      expect(mockExtractor.extractCount).toBe(2); // re-extraction — lazy cache not used for non-lazy extractors
       expect(urlResults).toHaveLength(1);
-      expect(urlResults[0]?.url.pathname).toContain('/extract');
+      expect(urlResults[0]?.url.pathname).not.toContain('/extract');
     });
 
     test('viaMediaFlowProxy=true skips /extract/ URLs even with allowLazy=true', async () => {

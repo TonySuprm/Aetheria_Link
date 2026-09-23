@@ -1,19 +1,66 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`MovieBox Avatar movie streams 1`] = `[]`;
+exports[`MovieBox Avatar movie streams 1`] = `
+[
+  {
+    "format": "hls",
+    "label": "720p",
+    "meta": {
+      "bytes": 5368709120,
+      "countryCodes": [
+        "multi",
+      ],
+      "extractorId": "moviebox",
+      "height": 720,
+    },
+    "requestHeaders": {
+      "Referer": "https://themoviebox.org/",
+    },
+    "ttl": 10800000,
+    "url": "https://cdn.themoviebox.org/hls/avatar-720p.m3u8",
+  },
+  {
+    "format": "mp4",
+    "label": "1080p",
+    "meta": {
+      "bytes": 10737418240,
+      "countryCodes": [
+        "multi",
+      ],
+      "extractorId": "moviebox",
+      "height": 1080,
+    },
+    "requestHeaders": {
+      "Referer": "https://themoviebox.org/",
+    },
+    "ttl": 10800000,
+    "url": "https://cdn.themoviebox.org/video/avatar-1080p.mp4",
+  },
+]
+`;
 
-exports[`MovieBox Breaking Bad S01E01 streams 1`] = `[]`;
+exports[`MovieBox Breaking Bad S01E01 streams 1`] = `
+[
+  {
+    "format": "mp4",
+    "label": "1920w",
+    "meta": {
+      "bytes": undefined,
+      "countryCodes": [
+        "multi",
+      ],
+      "extractorId": "moviebox",
+      "height": undefined,
+    },
+    "requestHeaders": {
+      "Referer": "https://themoviebox.org/",
+    },
+    "ttl": 10800000,
+    "url": "https://cdn.themoviebox.org/video/breaking-bad-s01e01.mp4",
+  },
+]
+`;
 
-exports[`MovieBox HLS stream 1`] = `[]`;
-
-exports[`MovieBox MP4 format field without .mp4 in URL 1`] = `[]`;
+exports[`MovieBox Empty page returns empty 1`] = `[]`;
 
 exports[`MovieBox No streams available 1`] = `[]`;
-
-exports[`MovieBox No subjectId returns empty 1`] = `[]`;
-
-exports[`MovieBox Non-zero response code returns empty 1`] = `[]`;
-
-exports[`MovieBox URL without se/ep params uses defaults 1`] = `[]`;
-
-exports[`MovieBox Unknown format stream 1`] = `[]`;

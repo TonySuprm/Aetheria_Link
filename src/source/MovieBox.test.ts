@@ -16,9 +16,9 @@ describe('MovieBox', () => {
     expect(streams).toMatchSnapshot();
   });
 
-  test('handle tv breaking bad s1e1', async () => {
+  test('handle tv returns empty (TV unsupported natively)', async () => {
     const streams = await source.handle(ctx, 'series', new TmdbId(1396, 1, 1));
-    expect(streams).toMatchSnapshot();
+    expect(streams).toHaveLength(0);
   });
 
   test('handle not found movie', async () => {
@@ -26,9 +26,12 @@ describe('MovieBox', () => {
     expect(streams).toHaveLength(0);
   });
 
-  test('handle movie with no resources available', async () => {
+  test('handle movie found in search returns detail url', async () => {
     const streams = await source.handle(ctx, 'movie', new TmdbId(7777777, undefined, undefined));
-    expect(streams).toHaveLength(0);
+    expect(streams).toHaveLength(1);
+    const stream = streams.find(s => s.meta.title === 'NoResourcesMovie (2020)');
+    expect(stream).toBeDefined();
+    expect(stream?.url.toString()).toBe('https://themoviebox.org/moviesDetail/noresourcesmovie-xyz789');
   });
 
   test('handle movie with fallback match', async () => {
@@ -36,33 +39,10 @@ describe('MovieBox', () => {
     expect(streams).toHaveLength(1);
     const stream = streams.find(s => s.meta.title === 'FallbackMovie (2022)');
     expect(stream).toBeDefined();
+    expect(stream?.url.toString()).toBe('https://themoviebox.org/moviesDetail/the-fallbackmovie-saga-abc123');
   });
 
-  test('handle tv with no title match but fallback', async () => {
-    const streams = await source.handle(ctx, 'series', new TmdbId(8888889, 1, 1));
-    expect(streams).toHaveLength(1);
-    const stream = streams.find(s => s.url.searchParams.get('subjectId') === '1111111111111111111');
-    expect(stream).toBeDefined();
-  });
-
-  test('handle tv with no season match but fallback', async () => {
-    const streams = await source.handle(ctx, 'series', new TmdbId(8888890, 3, 1));
-    expect(streams).toHaveLength(1);
-    const stream = streams.find(s => s.url.searchParams.get('se') === '3' && s.url.searchParams.get('ep') === '1');
-    expect(stream).toBeDefined();
-  });
-
-  test('handle tv with no title match and no fallback', async () => {
-    const streams = await source.handle(ctx, 'series', new TmdbId(8888891, 1, 1));
-    expect(streams).toHaveLength(0);
-  });
-
-  test('handle tv with title match but no resources', async () => {
-    const streams = await source.handle(ctx, 'series', new TmdbId(8888892, 1, 1));
-    expect(streams).toHaveLength(0);
-  });
-
-  test('returns empty when search API returns non-JSON', async () => {
+  test('returns empty when search page payload is non-JSON', async () => {
     const streams = await source.handle(ctx, 'movie', new TmdbId(6666666, undefined, undefined));
     expect(streams).toHaveLength(0);
   });
