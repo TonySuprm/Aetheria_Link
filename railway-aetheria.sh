@@ -45,7 +45,43 @@ if [ -z "${TMDB_ACCESS_TOKEN}" ]; then
   echo "[aetheria] WARNING: TMDB_ACCESS_TOKEN is not set. Most sources will not resolve IDs."
 fi
 
-echo "[aetheria] running supervisord status:"
-supervisorctl status || true
+# ── Start MediaFlow Proxy directly (bypasses supervisord env-quoting bugs) ──
+echo "[aetheria] starting MediaFlow Proxy on 127.0.0.1:8889..."
+CONFIG_PATH=/app/mediaflow-config.toml \
+RUST_LOG=info \
+/usr/local/bin/mediaflow-proxy-light &
+MFP_PID=$!
+
+# Wait up to 15 seconds for MFP to bind
+MFP_READY=0
+for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+  if kill -0 "$MFP_PID" 2>/dev/null; then
+    # Check if port 8889 is listening
+    if command -v curl >/dev/null 2>&1; then
+      if curl -sf http://127.0.0.1:8889/ >/dev/null 2>&1; then
+        MFP_READY=1
+        break
+      fi
+    else
+      # No curl — just check if the process is alive after a short delay
+      sleep 1
+      if kill -0 "$MFP_PID" 2>/dev/null; then
+        MFP_READY=1
+        break
+      fi
+    fi
+  else
+    echo "[aetheria] ERROR: MediaFlow Proxy crashed (PID $MFP_PID exited)"
+    break
+  fi
+  sleep 1
+done
+
+if [ "$MFP_READY" = "1" ]; then
+  echo "[aetheria] MediaFlow Proxy is ready (PID $MFP_PID)"
+else
+  echo "[aetheria] WARNING: MediaFlow Proxy may not be ready — proceeding anyway"
+fi
+
 echo "[aetheria] starting addon on port $PORT..."
 exec npm start

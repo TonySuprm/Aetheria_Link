@@ -182,6 +182,21 @@ addon.get('/config', (_req, res) => {
   res.json(lastSyncedConfig || {});
 });
 
+import { execSync } from 'node:child_process';
+addon.get('/debug-mediaflow', (_req, res) => {
+  try {
+    let output = '';
+    output += '=== SUPERVISOR STATUS ===\n';
+    try { output += execSync('supervisorctl status').toString() + '\n'; } catch (e: any) { output += e.message + '\n'; }
+    output += '\n=== SUPERVISORD LOG ===\n';
+    try { output += execSync('tail -n 100 /tmp/supervisord.log || true').toString() + '\n'; } catch (e: any) { output += e.message + '\n'; }
+    res.setHeader('Content-Type', 'text/plain');
+    res.send(output);
+  } catch (err: any) {
+    res.status(500).send(err.message);
+  }
+});
+
 addon.get('/', (_req, res) => {
   res.redirect('/configure');
 });
