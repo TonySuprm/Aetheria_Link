@@ -54,9 +54,9 @@ export type CustomRequestConfig = AxiosRequestConfig & {
 export class Fetcher {
   private static readonly DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 
-  private readonly DEFAULT_TIMEOUT = 10000;
+  private readonly DEFAULT_TIMEOUT = 20000;
   private readonly DEFAULT_QUEUE_LIMIT = 50;
-  private readonly DEFAULT_QUEUE_TIMEOUT = 10000;
+  private readonly DEFAULT_QUEUE_TIMEOUT = 20000;
   private readonly DEFAULT_TIMEOUTS_COUNT_THROW = 30;
   private readonly TIMEOUT_CACHE_TTL = 60 * 60 * 1000; // 1h
   private readonly FLARESOLVERR_CACHE_TTL = 15 * 60 * 1000; // 15m

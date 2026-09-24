@@ -13,7 +13,7 @@ export PORT="${PORT:-51546}"
 # HOST unset so the app resolves the hostname from each incoming request.
 export STREAM_MAX_MS="${STREAM_MAX_MS:-35000}"
 export STREAM_BACKGROUND_MAX_MS="${STREAM_BACKGROUND_MAX_MS:-120000}"
-export FLARESOLVERR_ENDPOINT="${FLARESOLVERR_ENDPOINT:-http://localhost:8191/v1}"
+export FLARESOLVERR_ENDPOINT="${FLARESOLVERR_ENDPOINT:-http://127.0.0.1:8191/v1}"
 export MEDIA_FLOW_PROXY_URL="${MEDIA_FLOW_PROXY_URL:-http://127.0.0.1:8889}"
 export MEDIA_FLOW_PROXY_PASSWORD="${MEDIA_FLOW_PROXY_PASSWORD:-aetheria-link-secret}"
 export CONFIG_PATH="${CONFIG_PATH:-/app/mediaflow-config.toml}"
