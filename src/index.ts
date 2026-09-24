@@ -18,7 +18,7 @@ import { MeineCloud } from './source/MeineCloud';
 import { MostraGuarda } from './source/MostraGuarda';
 // import { XYZ111477 } from './source/XYZ111477'; // Disabled per user request
 import type { Context } from './types';
-import { clearCache, contextFromRequestAndResponse, envGet, envIsProd, Fetcher, getBrowser, StreamResolver } from './utils';
+import { clearCache, contextFromRequestAndResponse, ensureEmbeddedMediaFlowProxy, envGet, envIsProd, Fetcher, getBrowser, StreamResolver } from './utils';
 import { getConfigWithEnvFallback } from './utils/config';
 import { setSyncedConfig } from './utils/syncedConfig';
 
@@ -914,6 +914,13 @@ const port = parseInt(envGet('PORT') || '51546');
     id: 'prewarm',
     config: getConfigWithEnvFallback(undefined),
   };
+
+  // Guarantee the embedded MediaFlow Proxy sidecar is up even when the
+  // container starts with a bare `npm start` (Railway Procfile/service
+  // start-command override) that skips supervisord/railway-aetheria.sh —
+  // without it every /proxy/* playback dies with ECONNREFUSED. Runs in the
+  // background: it must never delay the /startup healthcheck.
+  ensureEmbeddedMediaFlowProxy(logger).catch((error: unknown) => logger.warn(`MediaFlow Proxy sidecar bootstrap failed: ${error instanceof Error ? error.message : String(error)}`));
 
   // Start listening immediately so Railway's /startup healthcheck passes
   // before any slow sidecars or pre-warms have finished. Bind to 0.0.0.0 so

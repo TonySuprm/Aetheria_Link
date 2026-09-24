@@ -1,5 +1,6 @@
-import { Context } from '../types';
+import { createServer } from 'node:net';
 import { createTestContext } from '../test';
+import { Context } from '../types';
 import { FetcherMock } from './FetcherMock';
 import {
   buildMediaFlowProxyExtractorRedirectUrl,
@@ -7,6 +8,8 @@ import {
   buildMediaFlowProxyHlsUrl,
   buildMediaFlowProxyStreamUrl,
   isEmbeddedMediaFlowProxy,
+  parseLoopbackProxyTarget,
+  probePort,
   supportsMediaFlowProxy,
 } from './media-flow-proxy';
 
@@ -117,5 +120,32 @@ describe('embedded (loopback) proxy -> public host rewrite', () => {
   test('external (public) proxy config keeps its own origin', () => {
     const url = buildMediaFlowProxyHlsUrl(ctxWithProxy, new URL('https://example.com/stream.m3u8'));
     expect(url.origin).toBe('http://proxy.example.com');
+  });
+});
+
+describe('embedded sidecar bootstrap', () => {
+  test('parseLoopbackProxyTarget resolves loopback urls', () => {
+    expect(parseLoopbackProxyTarget('http://127.0.0.1:8889')).toEqual({ host: '127.0.0.1', port: 8889 });
+    expect(parseLoopbackProxyTarget('127.0.0.1:8889')).toEqual({ host: '127.0.0.1', port: 8889 });
+    expect(parseLoopbackProxyTarget('http://0.0.0.0:8889')).toEqual({ host: '127.0.0.1', port: 8889 });
+    expect(parseLoopbackProxyTarget('http://[::1]:8889')).toEqual({ host: '::1', port: 8889 });
+    expect(parseLoopbackProxyTarget('http://localhost:8889')).toEqual({ host: 'localhost', port: 8889 });
+    expect(parseLoopbackProxyTarget('http://localhost')).toEqual({ host: 'localhost', port: 8889 });
+  });
+
+  test('parseLoopbackProxyTarget rejects external or empty config', () => {
+    expect(parseLoopbackProxyTarget('https://mediaflow.example.com')).toBeNull();
+    expect(parseLoopbackProxyTarget('')).toBeNull();
+    expect(parseLoopbackProxyTarget('  ')).toBeNull();
+  });
+
+  test('probePort detects a listening socket and a closed one', async () => {
+    const server = createServer();
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', () => resolve()));
+    const address = server.address();
+    const port = typeof address === 'object' && address ? address.port : 0;
+    await expect(probePort('127.0.0.1', port)).resolves.toBe(true);
+    await new Promise<void>(resolve => server.close(() => resolve()));
+    await expect(probePort('127.0.0.1', port)).resolves.toBe(false);
   });
 });

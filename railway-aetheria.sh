@@ -1,8 +1,10 @@
 #!/bin/sh
 # Railway/Docker entrypoint for Aetheria Link.
 # Mirrors start-all.ps1 at runtime: apply env defaults, clear stale caches,
-# rebuild from source, then start the Node addon. Sidecars (FlareSolverr and
-# MediaFlow Proxy) are started by supervisord alongside this process.
+# rebuild from source, then start the Node addon. FlareSolverr is started by
+# supervisord alongside this process; MediaFlow Proxy is started below (and,
+# as a safety net for bare `npm start` launches, the add-on itself spawns it
+# when it finds the port closed — see ensureEmbeddedMediaFlowProxy).
 
 PROJECT_DIR="${PROJECT_DIR:-/app}"
 

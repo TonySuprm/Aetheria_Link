@@ -1,4 +1,11 @@
+import { spawn } from 'node:child_process';
+import type { ChildProcess } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import { createConnection } from 'node:net';
+import type { Readable } from 'node:stream';
+import type { Logger } from 'winston';
 import { Context } from '../types';
+import { envGet } from './env';
 import { Fetcher } from './Fetcher';
 
 interface ExtractResult {
@@ -23,8 +30,11 @@ const LOOPBACK_PROXY_HOSTS = new Set(['localhost', '127.0.0.1', '0.0.0.0', '[::1
  */
 export const isEmbeddedMediaFlowProxy = (value?: string): boolean => {
   if (!value) return false;
-  const hostPart = stripProtocol(value).split('/')[0]?.split('[')[0] ?? '';
-  const host = hostPart.split(':')[0]?.trim().toLowerCase();
+  const hostPart = stripProtocol(value).split('/')[0] ?? '';
+  // Bracketed IPv6 ([::1]:8889) must be captured before any ':' split —
+  // splitting the raw host on '[' or ':' mangles it into an empty string.
+  const bracketed = hostPart.match(/^\[([^\]]+)\]/);
+  const host = (bracketed ? bracketed[1] : hostPart.split(':')[0])?.trim().toLowerCase();
   return host ? LOOPBACK_PROXY_HOSTS.has(host) : false;
 };
 
@@ -124,4 +134,165 @@ export const buildMediaFlowProxyStreamUrl = (ctx: Context, url: URL, headers: Re
     mediaFlowProxyUrl.searchParams.set('h_' + headerKey.toLowerCase(), headers[headerKey] as string);
   }
   return mediaFlowProxyUrl;
+};
+
+// ── Embedded MediaFlow Proxy sidecar ──────────────────────────────────────
+// In the bundled Railway image the proxy co-runs on loopback and
+// railway-aetheria.sh (via supervisord) starts it before `npm start`. But a
+// Procfile/service start-command override makes Railway run a bare
+// `npm start` instead, skipping supervisord entirely — every /proxy/*
+// playback then dies with ECONNREFUSED. As a safety net the add-on probes
+// the configured loopback proxy at startup and spawns the bundled binary
+// itself when nothing is listening (no-op when it is already running).
+const MFP_DEFAULT_URL = 'http://127.0.0.1:8889';
+const MFP_BINARY_CANDIDATES = ['/usr/local/bin/mediaflow-proxy-light', '/app/mediaflow-proxy-light'];
+const MFP_PROBE_TIMEOUT_MS = 750;
+const MFP_READY_TIMEOUT_MS = 15_000;
+const MFP_MAX_RESTARTS = 5;
+const MFP_RESTART_DELAY_MS = 2_000;
+const MFP_STABLE_UPTIME_MS = 60_000;
+
+export interface LoopbackProxyTarget {
+  host: string;
+  port: number;
+}
+
+/**
+ * Resolves the probe/spawn target for an embedded (loopback) proxy URL.
+ * Returns null for external proxies and empty values — those are somebody
+ * else's process to keep alive.
+ */
+export const parseLoopbackProxyTarget = (value: string): LoopbackProxyTarget | null => {
+  const trimmed = value.trim();
+  if (!trimmed || !isEmbeddedMediaFlowProxy(trimmed)) return null;
+  const normalized = /^https?:\/\//i.test(trimmed) ? trimmed : `http://${trimmed}`;
+  try {
+    const url = new URL(normalized);
+    const host = url.hostname.replace(/^\[|\]$/g, '').replace(/^0\.0\.0\.0$/, '127.0.0.1');
+    if (!host) return null;
+    return { host, port: url.port ? parseInt(url.port, 10) : 8889 };
+  } catch {
+    return null;
+  }
+};
+
+/** True when something already accepts TCP connections on host:port. */
+export const probePort = (host: string, port: number, timeoutMs = MFP_PROBE_TIMEOUT_MS): Promise<boolean> =>
+  new Promise((resolve) => {
+    const socket = createConnection({ host, port });
+    const settle = (result: boolean): void => {
+      socket.removeAllListeners();
+      socket.destroy();
+      resolve(result);
+    };
+    socket.setTimeout(timeoutMs, () => settle(false));
+    socket.once('connect', () => settle(true));
+    socket.once('error', () => settle(false));
+  });
+
+let supervisedChild: ChildProcess | undefined;
+let supervisionShuttingDown = false;
+let exitHookRegistered = false;
+
+const pipeSidecarOutput = (logger: Logger, stream: Readable | null, level: 'info' | 'warn'): void => {
+  if (!stream) return;
+  let carry = '';
+  stream.on('data', (chunk: Buffer) => {
+    carry += chunk.toString('utf8');
+    const lines = carry.split('\n');
+    carry = lines.pop() ?? '';
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed) logger[level](`[mfp] ${trimmed}`);
+    }
+  });
+};
+
+const spawnSupervisedProxy = (logger: Logger, binary: string, host: string, port: number, attempt: number): void => {
+  const env: Record<string, string> = {};
+  for (const [key, value] of Object.entries(process.env)) {
+    if (value === undefined) continue;
+    // The binary's Python-compat layer maps bare PORT/HOST onto its bind
+    // address (config.rs compat_pairs). Those hold the ADDON's values here
+    // and would repoint the sidecar onto the addon's own port — EADDRINUSE
+    // on Linux, wrong port everywhere else.
+    if (key === 'PORT' || key === 'HOST') continue;
+    env[key] = value;
+  }
+  // Pin the bind address to exactly the probed loopback target: the APP__*
+  // form wins over both the config file and the compat env vars.
+  env['APP__SERVER__HOST'] = host === 'localhost' ? '127.0.0.1' : host;
+  env['APP__SERVER__PORT'] = String(port);
+  if (!env['CONFIG_PATH'] && existsSync('/app/mediaflow-config.toml')) env['CONFIG_PATH'] = '/app/mediaflow-config.toml';
+  env['RUST_LOG'] = env['RUST_LOG'] ?? 'info';
+
+  const child = spawn(binary, [], { stdio: ['ignore', 'pipe', 'pipe'], env });
+  supervisedChild = child;
+  const startedAt = Date.now();
+
+  pipeSidecarOutput(logger, child.stdout, 'info');
+  pipeSidecarOutput(logger, child.stderr, 'warn');
+  logger.info(`[mfp] spawned ${binary} (pid ${child.pid ?? '?'}) for ${host}:${port}`);
+
+  child.once('exit', (code, signal) => {
+    if (supervisedChild === child) supervisedChild = undefined;
+    if (supervisionShuttingDown) return;
+    // A child that stayed up for a while gets a fresh restart budget; one
+    // that keeps dying within seconds burns it.
+    const nextAttempt = Date.now() - startedAt >= MFP_STABLE_UPTIME_MS ? 1 : attempt + 1;
+    if (nextAttempt > MFP_MAX_RESTARTS) {
+      logger.error(`[mfp] exited (code=${code ?? '?'} signal=${signal ?? '?'}) and the restart budget is exhausted — MediaFlow Proxy streams will fail until the container restarts.`);
+      return;
+    }
+    logger.warn(`[mfp] exited (code=${code ?? '?'} signal=${signal ?? '?'}); restart ${nextAttempt}/${MFP_MAX_RESTARTS} in ${MFP_RESTART_DELAY_MS / 1000}s`);
+    setTimeout(() => {
+      if (!supervisionShuttingDown) spawnSupervisedProxy(logger, binary, host, port, nextAttempt);
+    }, MFP_RESTART_DELAY_MS).unref();
+  });
+};
+
+/**
+ * Ensures the embedded loopback MediaFlow Proxy is running before the first
+ * /proxy/* playback request arrives. Returns true once the port accepts
+ * connections. Safe to call in any deployment shape: external proxies,
+ * missing binaries and already-running instances are all detected and
+ * skipped.
+ */
+export const ensureEmbeddedMediaFlowProxy = async (logger: Logger): Promise<boolean> => {
+  const target = parseLoopbackProxyTarget(envGet('MEDIA_FLOW_PROXY_URL') ?? MFP_DEFAULT_URL);
+  if (!target) return false; // external proxy or none configured: not ours to start
+
+  const { host, port } = target;
+  if (await probePort(host, port)) {
+    logger.info(`MediaFlow Proxy already listening on ${host}:${port}.`);
+    return true;
+  }
+
+  const binary = envGet('MEDIA_FLOW_PROXY_BIN') ?? MFP_BINARY_CANDIDATES.find(candidate => existsSync(candidate));
+  if (!binary) {
+    logger.warn(`MediaFlow Proxy is not listening on ${host}:${port} and no bundled binary was found — MediaFlow Proxy streams (dailymotion, ok.ru, rumble, ...) will fail with 502. Deploy via the Dockerfile (supervisord) or start the proxy with start-all.ps1.`);
+    return false;
+  }
+
+  if (!exitHookRegistered) {
+    exitHookRegistered = true;
+    process.on('exit', () => {
+      supervisionShuttingDown = true;
+      supervisedChild?.kill();
+    });
+  }
+
+  logger.info(`MediaFlow Proxy not reachable on ${host}:${port} — starting bundled binary ${binary}.`);
+  spawnSupervisedProxy(logger, binary, host, port, 1);
+
+  const deadline = Date.now() + MFP_READY_TIMEOUT_MS;
+  while (Date.now() < deadline) {
+    await new Promise(resolve => setTimeout(resolve, 250));
+    if (await probePort(host, port)) {
+      logger.info(`MediaFlow Proxy is ready on ${host}:${port}.`);
+      return true;
+    }
+  }
+  logger.warn(`MediaFlow Proxy did not accept connections on ${host}:${port} within ${MFP_READY_TIMEOUT_MS / 1000}s — see the [mfp] log lines above.`);
+  return false;
 };
