@@ -56,4 +56,4 @@ start/
 /out_*.txt
 /jest_output.txt
 /lucifer_html.txt
-/*.html
+/*.html!dist/**
