@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck -- the Puppeteer page.evaluate callbacks execute in a browser context (document/window) which is not part of the Node tsconfig lib
 import { createDecipheriv } from 'node:crypto';
-import { Browser } from 'puppeteer';
+import type { Browser } from '../utils/puppeteer';
 import { ContentType } from 'stremio-addon-sdk';
 import { Context, CountryCode } from '../types';
 import { envGet, Fetcher, findHeight, getBrowser, getTmdbId, getTmdbNameAndYear, Id, stealthPage } from '../utils';

@@ -1,14 +1,45 @@
-import { Browser, CookieParam, Page } from 'puppeteer';
-import puppeteer from 'puppeteer';
+/**
+ * Browser-automation layer. Puppeteer is an OPTIONAL dependency: hosts with a
+ * real desktop Chrome (PC / Docker image) get full anti-bot fallbacks; hosts
+ * without one (Android on-device hosting) still boot and serve every source
+ * whose fetch path does not need a browser — calls degrade with a clear error
+ * instead of crashing the addon.
+ */
 import winston from 'winston';
 
-let browser: Browser | null = null;
+// Minimal structural types so this module (and sources importing types from
+// here) compile even when the puppeteer package is not installed.
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export type Browser = any;
+export type Page = any;
+export type CookieParam = any;
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
+let puppeteerModule: any = undefined;
+
+function loadPuppeteer(): any {
+  if (puppeteerModule !== undefined) return puppeteerModule;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    puppeteerModule = require('puppeteer');
+  } catch {
+    puppeteerModule = null;
+  }
+  return puppeteerModule;
+}
+
+export function browserAvailable(): boolean {
+  return !!process.env['PUPPETEER_EXECUTABLE_PATH'] && !!loadPuppeteer();
+}
+
+let browser: Browser = null;
 let browserPromise: Promise<Browser> | null = null;
 
 const executablePath = process.env['PUPPETEER_EXECUTABLE_PATH'];
 
 const DEFAULT_LAUNCH_OPTIONS = {
   headless: true,
+  ...(executablePath ? { executablePath } : {}),
   args: [
     '--no-sandbox',
     '--disable-setuid-sandbox',
@@ -27,7 +58,7 @@ const DEFAULT_LAUNCH_OPTIONS = {
     '--disable-prompt-on-repost',
     '--disable-hang-monitor',
     '--disable-client-side-phishing-detection',
-    '--disable-component-extensions-with-background-pages',
+    '--disable-component-extensions-with-background-extensions',
     '--disable-extensions',
     '--disable-sync',
     '--metrics-recording-only',
@@ -39,12 +70,17 @@ const DEFAULT_LAUNCH_OPTIONS = {
     '--ignore-certificate-errors-spki-list',
     '--disable-blink-features=AutomationControlled',
   ],
-  ...(executablePath && { executablePath }),
 };
 
 export async function getBrowser(logger: winston.Logger): Promise<Browser> {
   if (browser && browser.connected) {
     return browser;
+  }
+
+  const puppeteer = loadPuppeteer();
+  if (!puppeteer) {
+    // Clear, non-fatal degradation: callers treat this as a per-source failure.
+    throw new Error('No browser automation on this host (puppeteer not installed) — source unavailable, try another');
   }
 
   if (!browserPromise) {
@@ -119,7 +155,7 @@ export async function puppeteerFetch(
     await page.setViewport({ width: 1280, height: 720 });
 
     await page.setRequestInterception(true);
-    page.on('request', (req) => {
+    page.on('request', (req: any) => {
       const resourceType = req.resourceType();
       if (['image', 'stylesheet', 'font', 'media'].includes(resourceType)) {
         req.abort();
@@ -233,7 +269,7 @@ export async function puppeteerFetchWithFlareSolverr(
     }
 
     await page.setRequestInterception(true);
-    page.on('request', (req) => {
+    page.on('request', (req: any) => {
       const resourceType = req.resourceType();
       if (['image', 'stylesheet', 'font', 'media'].includes(resourceType)) {
         req.abort();

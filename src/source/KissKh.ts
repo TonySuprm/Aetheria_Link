@@ -1,4 +1,4 @@
-import { Page } from 'puppeteer';
+import type { Page } from '../utils/puppeteer';
 import { ContentType } from 'stremio-addon-sdk';
 import { Context, CountryCode } from '../types';
 import { Fetcher, getTmdbId, getTmdbNameAndYear, Id, puppeteerFetch } from '../utils';
@@ -79,7 +79,7 @@ export class KissKh extends Source {
                 waitUntil: 'networkidle2',
                 timeout: 25000,
                 evaluate: async (page: Page) => {
-                    page.on('response', async res => {
+                    page.on('response', async (res: any) => {
                         if (res.url().includes('/api/DramaList/Episode/') && res.url().includes('.png') && res.url().includes('kkey=')) {
                             try {
                                 const text = await res.text();
