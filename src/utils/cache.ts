@@ -2,19 +2,49 @@
 import fs from 'node:fs';
 import * as os from 'node:os';
 // eslint-disable-next-line import/no-named-as-default
-import KeyvSqlite from '@keyv/sqlite';
 import { KeyvCacheableMemory } from 'cacheable';
-import { glob } from 'glob';
 import { KeyvStoreAdapter } from 'keyv';
-import * as sqlite3 from 'sqlite3';
 import winston from 'winston';
 import { envGet, envIsTest } from './env';
 
+/**
+ * Native SQLite is optional: on hosts without a native toolchain (Android
+ * on-device hosting, slim containers) the sqlite3 install is skipped via
+ * optionalDependencies and the cache silently falls back to the pure-JS
+ * in-memory store. Both modules are therefore loaded lazily.
+ */
+type KeyvSqliteLike = KeyvStoreAdapter & { opts: { db?: string } };
+type Sqlite3Like = { Database: new (file: string) => {
+  serialize: (fn: () => void) => void;
+  run: (sql: string, cb: () => void) => void;
+  close: () => void;
+} };
+
+const loadKeyvSqlite = (): (new (uri: string) => KeyvSqliteLike) | null => {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('@keyv/sqlite') as { default: new (uri: string) => KeyvSqliteLike };
+    return mod.default || (mod as unknown as new (uri: string) => KeyvSqliteLike);
+  } catch {
+    return null;
+  }
+};
+
+const loadSqlite3 = (): Sqlite3Like | null => {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    return require('sqlite3') as Sqlite3Like;
+  } catch {
+    return null;
+  }
+};
+
 const getCacheDir = (): string => envGet('CACHE_DIR') ?? os.tmpdir();
 
-const scheduleKeyvSqliteCleanup = (keyvSqlite: KeyvSqlite): void => {
+const scheduleKeyvSqliteCleanup = (keyvSqlite: KeyvSqliteLike): void => {
+  const sqlite3 = loadSqlite3();
   const filename = keyvSqlite.opts.db;
-  if (envIsTest() || !filename || !fs.existsSync(filename)) {
+  if (envIsTest() || !filename || !sqlite3 || !fs.existsSync(filename)) {
     return;
   }
 
@@ -31,12 +61,14 @@ const scheduleKeyvSqliteCleanup = (keyvSqlite: KeyvSqlite): void => {
 
 export const createKeyvSqlite = (name: string): KeyvStoreAdapter => {
   const cacheDir = getCacheDir();
+  const KeyvSqlite = loadKeyvSqlite();
 
-  if (envIsTest() || !cacheDir) {
+  if (envIsTest() || !cacheDir || !KeyvSqlite) {
+    // No native SQLite available (or tests): pure-JS in-memory cache.
     return new KeyvCacheableMemory();
   }
 
-  const keyvSqlite = new KeyvSqlite(`sqlite://${cacheDir}/aetheria-link-${name}.sqlite`);
+  const keyvSqlite = new KeyvSqlite(`sqlite://${cacheDir}/aetheria-link-${name}.sqlite`) as KeyvSqliteLike;
 
   scheduleKeyvSqliteCleanup(keyvSqlite);
 
@@ -44,7 +76,17 @@ export const createKeyvSqlite = (name: string): KeyvStoreAdapter => {
 };
 
 export const clearCache = async (logger: winston.Logger): Promise<void> => {
-  for (const file of await glob(`${getCacheDir()}/aetheria-link*`)) {
+  const cacheDir = getCacheDir();
+  // fs listing instead of glob@13: glob 13 requires Node >= 20 and the addon
+  // must also boot on Node 18 runtimes (e.g. nodejs-mobile on-device hosting).
+  let entries: string[] = [];
+  try {
+    entries = fs.readdirSync(cacheDir).filter((entry) => entry.startsWith('aetheria-link'));
+  } catch {
+    return; // cache dir does not exist yet — nothing to clear
+  }
+  for (const entry of entries) {
+    const file = `${cacheDir}/${entry}`;
     try {
       fs.rmSync(file);
       logger.info(`Delete cache file ${file}`);

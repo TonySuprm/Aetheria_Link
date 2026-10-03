@@ -50,7 +50,18 @@ export async function getBrowser(logger: winston.Logger): Promise<Browser> {
   if (!browserPromise) {
     browserPromise = (async () => {
       logger.info('Launching Puppeteer browser...');
-      const launchedBrowser = await puppeteer.launch(DEFAULT_LAUNCH_OPTIONS);
+      let launchedBrowser: Browser;
+      try {
+        launchedBrowser = await puppeteer.launch(DEFAULT_LAUNCH_OPTIONS);
+      } catch (error) {
+        // No usable browser on this host (e.g. Android on-device hosting has no
+        // desktop Chrome). Reset the promise so later calls retry, and surface a
+        // clear error — callers treat this as a per-source failure, not a crash.
+        browserPromise = null;
+        const message = error instanceof Error ? error.message : String(error);
+        logger.warn(`Puppeteer browser unavailable on this host: ${message}`);
+        throw new Error(`Puppeteer browser unavailable on this host: ${message}`);
+      }
       logger.info('Puppeteer browser launched');
 
       launchedBrowser.on('disconnected', () => {
