@@ -50,7 +50,7 @@
     "bytes": "^3.1.2",
     "cacheable": "^2.0.0",
     "cheerio": "^1.0.0",
-    "express": "^5.1.0",
+    "express": "^4.21.2",
     "express-rate-limit": "^8.2.1",
     "fast-levenshtein": "^3.0.0",
     "fuse.js": "^7.3.0",
