@@ -25,13 +25,14 @@ const getConfigWithEnvFallback = (urlConfig) => {
     const envMediaFlowProxyPassword = (0, env_1.envGet)('MEDIA_FLOW_PROXY_PASSWORD');
     const envAlldebridApiKey = (0, env_1.envGet)('ALLDEBRID_API_KEY');
     const envRealdebridApiKey = (0, env_1.envGet)('REALDEBRID_API_KEY');
-    return {
+    const resolved = {
         ...baseConfig,
         ...(envMediaFlowProxyUrl && !baseConfig.mediaFlowProxyUrl && { mediaFlowProxyUrl: envMediaFlowProxyUrl }),
         ...(envMediaFlowProxyPassword && !baseConfig.mediaFlowProxyPassword && { mediaFlowProxyPassword: envMediaFlowProxyPassword }),
         ...(envAlldebridApiKey && !baseConfig.alldebridApiKey && { alldebridApiKey: envAlldebridApiKey }),
         ...(envRealdebridApiKey && !baseConfig.realdebridApiKey && { realdebridApiKey: envRealdebridApiKey }),
     };
+    return resolved;
 };
 exports.getConfigWithEnvFallback = getConfigWithEnvFallback;
 const showErrors = (config) => 'showErrors' in config;

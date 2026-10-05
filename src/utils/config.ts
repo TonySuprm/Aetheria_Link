@@ -30,13 +30,15 @@ export const getConfigWithEnvFallback = (urlConfig?: Config): Config => {
   const envAlldebridApiKey = envGet('ALLDEBRID_API_KEY');
   const envRealdebridApiKey = envGet('REALDEBRID_API_KEY');
 
-  return {
+  const resolved = {
     ...baseConfig,
     ...(envMediaFlowProxyUrl && !baseConfig.mediaFlowProxyUrl && { mediaFlowProxyUrl: envMediaFlowProxyUrl }),
     ...(envMediaFlowProxyPassword && !baseConfig.mediaFlowProxyPassword && { mediaFlowProxyPassword: envMediaFlowProxyPassword }),
     ...(envAlldebridApiKey && !baseConfig.alldebridApiKey && { alldebridApiKey: envAlldebridApiKey }),
     ...(envRealdebridApiKey && !baseConfig.realdebridApiKey && { realdebridApiKey: envRealdebridApiKey }),
   };
+
+  return resolved;
 };
 
 export const showErrors = (config: Config): boolean => 'showErrors' in config;

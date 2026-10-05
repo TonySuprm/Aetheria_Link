@@ -125,8 +125,10 @@ reqwest = { version = "0.12.28", default-features = false, features = ["stream",
 # Browser TLS/JA3 impersonation — used by extractors that hit Cloudflare-protected
 # hosts (e.g. DoodStream → playmogo.com). rquest is a reqwest fork with Chrome
 # fingerprint spoofing, equivalent to Python's curl_cffi with impersonate="chrome".
-rquest = { version = "5", default-features = false, features = ["full", "socks"] }
-rquest-util = "2"
+# [halcyon patch] rquest pulls boring-sys2 (BoringSSL: needs cmake+go+nasm) —
+# unused when the extractors feature is off (android build)
+# rquest = { version = "5", default-features = false, features = ["full", "socks"] }
+# rquest-util = "2"
 
 # Crypto — AES-CBC for proxy-URL encryption, AES-CTR for CENC DRM, AES-GCM for F16Px
 aes = "0.8"
