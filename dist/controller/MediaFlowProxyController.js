@@ -127,42 +127,75 @@ class MediaFlowProxyController {
             res.status(400).end('invalid dailymotion video id');
             return;
         }
-        const upstream = (0, node_https_1.request)(`https://www.dailymotion.com/player/metadata/video/${videoId}`, { headers: { ...Dailymotion_1.DAILYMOTION_METADATA_HEADERS, accept: 'application/json' } }, (upstreamRes) => {
-            if ((upstreamRes.statusCode ?? 500) >= 400) {
-                upstreamRes.resume();
-                this.logger.warn(`Dailymotion metadata HTTP ${upstreamRes.statusCode} for ${videoId}`);
-                res.status(502).end('dailymotion metadata unavailable');
-                return;
-            }
-            let data = '';
-            upstreamRes.setEncoding('utf8');
-            upstreamRes.on('data', (c) => { data += c; });
-            upstreamRes.on('end', () => {
-                let master;
-                try {
-                    master = (0, Dailymotion_1.pickDailymotionMasterHls)(JSON.parse(data));
-                }
-                catch (e) {
-                    this.logger.warn(`Dailymotion metadata parse failed for ${videoId}: ${e}`);
-                }
-                if (!master) {
-                    res.status(404).end('no dailymotion HLS manifest');
+        const metadataUrl = new URL(`https://www.dailymotion.com/player/metadata/video/${videoId}`);
+        // The manifest `sec=` token is bound to the IP that fetched the metadata.
+        // The manifest itself will be fetched BY MediaFlow — so the metadata MUST
+        // be fetched through MediaFlow too (its /proxy/stream relays the request
+        // from MFP's own IP), otherwise the token is issued to this add-on's IP
+        // and MFP's fetch 403s. This is what makes the Railway-hosted MFP work.
+        const viaProxyUrl = new URL('/proxy/stream', this.upstreamBase());
+        viaProxyUrl.searchParams.set('api_password', (0, utils_1.envGet)('MEDIA_FLOW_PROXY_PASSWORD') || 'aetheria-link-secret');
+        viaProxyUrl.searchParams.set('d', metadataUrl.href);
+        for (const [name, value] of Object.entries(Dailymotion_1.DAILYMOTION_METADATA_HEADERS)) {
+            viaProxyUrl.searchParams.set('h_' + name.toLowerCase(), value);
+        }
+        const fetchMetadata = (url, via) => {
+            const doRequest = url.protocol === 'https:' ? node_https_1.request : node_http_1.request;
+            const headers = { accept: 'application/json' };
+            if (via === 'direct')
+                Object.assign(headers, Dailymotion_1.DAILYMOTION_METADATA_HEADERS);
+            const upstream = doRequest(url, { headers }, (upstreamRes) => {
+                if ((upstreamRes.statusCode ?? 500) >= 400) {
+                    upstreamRes.resume();
+                    if (via === 'mfp') {
+                        this.logger.warn(`Dailymotion metadata via MFP HTTP ${upstreamRes.statusCode} — falling back to direct`);
+                        fetchMetadata(metadataUrl, 'direct');
+                        return;
+                    }
+                    this.logger.warn(`Dailymotion metadata HTTP ${upstreamRes.statusCode} for ${videoId}`);
+                    res.status(502).end('dailymotion metadata unavailable');
                     return;
                 }
-                res.setHeader('Cache-Control', 'no-store');
-                res.redirect(302, this.hlsProxyUrlFor(req, master).href);
+                let data = '';
+                upstreamRes.setEncoding('utf8');
+                upstreamRes.on('data', (c) => { data += c; });
+                upstreamRes.on('end', () => {
+                    let master;
+                    try {
+                        master = (0, Dailymotion_1.pickDailymotionMasterHls)(JSON.parse(data));
+                    }
+                    catch (e) {
+                        this.logger.warn(`Dailymotion metadata parse failed for ${videoId}: ${e}`);
+                    }
+                    if (!master) {
+                        if (via === 'mfp' && !res.headersSent) {
+                            this.logger.warn(`Dailymotion metadata via MFP unusable — falling back to direct`);
+                            fetchMetadata(metadataUrl, 'direct');
+                            return;
+                        }
+                        res.status(404).end('no dailymotion HLS manifest');
+                        return;
+                    }
+                    res.setHeader('Cache-Control', 'no-store');
+                    res.redirect(302, this.hlsProxyUrlFor(req, master).href);
+                });
+                upstreamRes.on('error', () => {
+                    if (!res.headersSent)
+                        res.status(502).end('dailymotion metadata error');
+                });
             });
-            upstreamRes.on('error', () => {
+            upstream.on('error', (err) => {
+                this.logger.warn(`Dailymotion metadata request error (${via}) for ${videoId}: ${err.message}`);
+                if (via === 'mfp' && !res.headersSent) {
+                    fetchMetadata(metadataUrl, 'direct');
+                    return;
+                }
                 if (!res.headersSent)
                     res.status(502).end('dailymotion metadata error');
             });
-        });
-        upstream.on('error', (err) => {
-            this.logger.warn(`Dailymotion metadata request error for ${videoId}: ${err.message}`);
-            if (!res.headersSent)
-                res.status(502).end('dailymotion metadata error');
-        });
-        upstream.end();
+            upstream.end();
+        };
+        fetchMetadata(viaProxyUrl, 'mfp');
     }
     /** MediaFlow HLS-proxy URL for `master`, built on the PUBLIC host the player used
      *  (x-forwarded aware, honours x-forwarded-prefix for reverse-proxied mounts). */
