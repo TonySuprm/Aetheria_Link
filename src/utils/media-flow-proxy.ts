@@ -290,6 +290,9 @@ const spawnSupervisedProxy = (logger: Logger, binary: string, host: string, port
     env['PROXY_URL'] = proxyUrl;
     env['HTTP_PROXY'] = proxyUrl;
     env['HTTPS_PROXY'] = proxyUrl;
+    // all_proxy=true activates proxy.proxy_url for ALL destinations in MFP's
+    // ProxyRouter (otherwise the default proxy is ignored entirely)
+    env['ALL_PROXY'] = 'true';
   }
   // [halcyon patch] auth parity: MFP must run with the SAME api_password the
   // relay sends, and with it set the _token_ encrypted-URI scheme activates
