@@ -130,6 +130,72 @@ exports.buildMediaFlowProxyStreamUrl = buildMediaFlowProxyStreamUrl;
 // itself when nothing is listening (no-op when it is already running).
 const MFP_DEFAULT_URL = 'http://127.0.0.1:8889';
 const MFP_BINARY_CANDIDATES = ['/usr/local/bin/mediaflow-proxy-light', '/app/mediaflow-proxy-light'];
+// [halcyon patch] musl static binaries cannot resolve DNS on Android (no
+// /etc/resolv.conf; the loopback fallback hits nothing). This CONNECT +
+// absolute-URI proxy runs inside the add-on (node resolves via the system)
+// and MFP's reqwest tunnels every upstream fetch through it via PROXY_URL.
+let sidecarProxyPort;
+const ensureSidecarDnsProxy = (logger) => {
+    if (sidecarProxyPort)
+        return sidecarProxyPort;
+    const srv = (0, node_net_1.createServer)((client) => {
+        client.once('data', (first) => {
+            const head = first.toString('latin1');
+            const connectMatch = head.match(/^CONNECT ([^:\s]+):(\d+)/);
+            const getMatch = head.match(/^([A-Z]+) (https?:\/\/)([^:\/\s]+)(?::(\d+))?(\/\S*) (HTTP\/[\d.]+)\r\n/);
+            if (connectMatch) {
+                client.pause();
+                const up = (0, node_net_1.createConnection)({ host: connectMatch[1], port: Number(connectMatch[2]) }, () => {
+                    client.write('HTTP/1.1 200 Connection established\r\n\r\n', () => {
+                        const idx = first.indexOf('\r\n\r\n');
+                        const rest = idx >= 0 ? first.subarray(idx + 4) : null;
+                        if (rest && rest.length)
+                            up.write(rest);
+                        client.on('data', (b) => up.write(b));
+                        up.on('data', (b) => client.write(b));
+                        client.resume();
+                    });
+                });
+                up.on('error', () => { try {
+                    client.end('HTTP/1.1 502 Bad Gateway\r\n\r\n');
+                }
+                catch { /* ignore */ } });
+                client.on('error', () => { try {
+                    up.destroy();
+                }
+                catch { /* ignore */ } });
+            }
+            else if (getMatch) {
+                const up = (0, node_net_1.createConnection)({ host: getMatch[3], port: Number(getMatch[4] || (getMatch[2] === 'https:' ? 443 : 80)) }, () => {
+                    const firstLineEnd = first.indexOf('\r\n');
+                    up.write(getMatch[1] + ' ' + getMatch[5] + ' ' + getMatch[6] + '\r\n' + first.subarray(firstLineEnd + 2).toString('latin1'));
+                    client.on('data', (b) => up.write(b));
+                    up.on('data', (b) => client.write(b));
+                });
+                up.on('error', () => { try {
+                    client.end('HTTP/1.1 502 Bad Gateway\r\n\r\n');
+                }
+                catch { /* ignore */ } });
+                client.on('error', () => { try {
+                    up.destroy();
+                }
+                catch { /* ignore */ } });
+            }
+            else {
+                try {
+                    client.end('HTTP/1.1 405 Method Not Allowed\r\n\r\n');
+                }
+                catch { /* ignore */ }
+            }
+        });
+    });
+    srv.on('error', () => { sidecarProxyPort = undefined; });
+    srv.listen(0, '127.0.0.1', () => {
+        sidecarProxyPort = srv.address().port;
+        logger.info('[mfp] dns-bypass proxy on 127.0.0.1:' + sidecarProxyPort);
+    });
+    return sidecarProxyPort;
+};
 // [halcyon patch] on-device (Halcyon) deployments: the musl static android
 // build ships via jniLibs exec-safe trick (like libffmpeg/libcloudflared) —
 // resolved at runtime from the worker-injected native bin dir.
@@ -213,6 +279,14 @@ const spawnSupervisedProxy = (logger, binary, host, port, attempt) => {
     // Pin the bind address to exactly the probed loopback target: the APP__*
     // form wins over both the config file and the compat env vars.
     env['APP__SERVER__HOST'] = host === 'localhost' ? '127.0.0.1' : host;
+    // [halcyon patch] route upstream fetches through the dns-bypass proxy
+    const proxyPort = ensureSidecarDnsProxy(logger);
+    if (proxyPort) {
+        const proxyUrl = 'http://127.0.0.1:' + proxyPort;
+        env['PROXY_URL'] = proxyUrl;
+        env['HTTP_PROXY'] = proxyUrl;
+        env['HTTPS_PROXY'] = proxyUrl;
+    }
     // [halcyon patch] auth parity: MFP must run with the SAME api_password the
     // relay sends, and with it set the _token_ encrypted-URI scheme activates
     if (!env['API_PASSWORD'])
