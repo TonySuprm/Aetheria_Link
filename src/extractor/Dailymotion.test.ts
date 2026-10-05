@@ -1,23 +1,31 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import winston from 'winston';
 import { createTestContext } from '../test';
-import { FetcherMock } from '../utils';
-import { Dailymotion } from './Dailymotion';
+import { Dailymotion, pickDailymotionMasterHls } from './Dailymotion';
 import { ExtractorRegistry } from './ExtractorRegistry';
 
 const logger = winston.createLogger({ transports: [new winston.transports.Console({ level: 'nope' })] });
-const extractorRegistry = new ExtractorRegistry(logger, [new Dailymotion(new FetcherMock(`${__dirname}/__fixtures__/Dailymotion`), logger)]);
+// The extractor no longer fetches the metadata API itself (play-time
+// resolution) — the fetcher is unused; registry construction stays realistic.
+const extractorRegistry = new ExtractorRegistry(logger, [new Dailymotion(undefined as never, logger)]);
 
 const ctx = createTestContext({ mediaFlowProxyUrl: 'https://mediaflow.test.org', mediaFlowProxyPassword: 'test' });
 
+
+
 /**
- * Dailymotion resolves the master `.m3u8` server-side (metadata API) and hands it to the MediaFlow
- * HLS proxy so the stream is playable by normal players (libvlc/mpv/Stremio-native) without yt-dlp
- * or custom header support. These tests assert the stable parts of the resulting proxy URL
- * (endpoint, password, referer, and the resolved absolute `d=` manifest) rather than snapshots,
- * since Dailymotion CDN `sec=` tokens are short-lived and change on every extraction.
+ * Dailymotion stream URLs are now PLAY-TIME resolver URLs on this add-on
+ * (`/dm/<id>.m3u8`, served by MediaFlowProxyController). The sec= manifest
+ * token is only minutes-lived and Dailymotion rate-limits per link, so the
+ * extractor must NOT fetch the metadata API at /stream time — the resolver
+ * route fetches a fresh manifest when the player actually presses play.
+ *
+ * The master-picking logic itself (auto master first, else highest ladder)
+ * is tested directly against recorded metadata fixtures.
  */
 describe('Dailymotion', () => {
-  test('resolves the master HLS manifest and routes it through the MFP HLS proxy', async () => {
+  test('returns a play-time resolver URL on the add-on host (no upstream calls)', async () => {
     const results = await extractorRegistry.handle(ctx, new URL('https://www.dailymotion.com/video/xbbtrw2'));
 
     expect(results).toHaveLength(1);
@@ -26,45 +34,53 @@ describe('Dailymotion', () => {
     expect(result.label).toBe('Dailymotion (MFP)');
 
     const url = new URL(result.url.href);
-    // Routed through MediaFlow's HLS proxy (absolute manifest `d=`, NOT the page URL).
-    expect(url.origin + url.pathname).toBe('https://mediaflow.test.org/proxy/hls/manifest.m3u8');
-    expect(url.searchParams.get('api_password')).toBe('test');
-    // The MFP proxy injects the browser UA + dailymotion Referer the CDN requires.
-    expect(url.searchParams.get('h_referer')).toBe('https://www.dailymotion.com/');
-    expect(url.searchParams.get('h_user-agent')).toContain('Mozilla');
-    // The resolved manifest must be the absolute cdndirector master m3u8 (auto quality first).
-    expect(url.searchParams.get('d')).toBe(
-      'https://cdndirector.dailymotion.com/cdn/manifest/video/xbbtrw2.m3u8?sec=FAKETOKEN123&dmTs=997274',
-    );
+    expect(url.origin).toBe('http://localhost');
+    expect(url.pathname).toBe('/dm/xbbtrw2.m3u8');
   });
 
-  test('without an auto master, picks the highest single-quality HLS ladder', async () => {
-    const results = await extractorRegistry.handle(ctx, new URL('https://www.dailymotion.com/video/xfa1234'));
-
+  test('parses the video id from a geo player page ?video= query', async () => {
+    const results = await extractorRegistry.handle(ctx, new URL('https://geo.dailymotion.com/player/xabc.html?video=x93u5v6'));
     expect(results).toHaveLength(1);
     const url = new URL(assertSingle(results).url.href);
-    expect(url.origin + url.pathname).toBe('https://mediaflow.test.org/proxy/hls/manifest.m3u8');
-    // 1080 outranks 720 when there is no `auto` master.
-    expect(url.searchParams.get('d')).toBe('https://cdndirector.dailymotion.com/cdn/m/fx-1080.m3u8?sec=FAKE1080');
-  });
-
-  test('parses the video id from a geo player page ?video= query and returns empty when no HLS quality', async () => {
-    const results = await extractorRegistry.handle(ctx, new URL('https://geo.dailymotion.com/player/xabc.html?video=x93u5v6'));
-    expect(results).toEqual([]);
+    expect(url.pathname).toBe('/dm/x93u5v6.m3u8');
   });
 
   test('does not support non-dailymotion hosts', async () => {
     expect(await extractorRegistry.handle(ctx, new URL('https://vimeo.com/12345'))).toEqual([]);
   });
 
-  test('returns empty when the metadata API fetch fails', async () => {
-    // `xerr999` has no fixture — the `.error` file makes FetcherMock throw, exercising the catch.
-    expect(await extractorRegistry.handle(ctx, new URL('https://www.dailymotion.com/video/xerr999'))).toEqual([]);
-  });
-
   test('does not support dailymotion hosts when MediaFlow Proxy is not configured', async () => {
     const noMfp = createTestContext();
     expect(await extractorRegistry.handle(noMfp, new URL('https://www.dailymotion.com/video/xbbtrw2'))).toEqual([]);
+  });
+
+  describe('pickDailymotionMasterHls (used by the /dm play-time resolver)', () => {
+    // FetcherMock fixture files are named after the metadata URL they record.
+    const loadFixture = (videoId: string): unknown =>
+      JSON.parse(
+        fs.readFileSync(
+          path.join(__dirname, '__fixtures__', 'Dailymotion', `https_www.dailymotion.complayermetadatavideo${videoId}`),
+          'utf8',
+        ),
+      );
+
+    test('prefers the adaptive auto master playlist', () => {
+      const metadata = loadFixture('xbbtrw2');
+      expect(pickDailymotionMasterHls(metadata)?.href).toBe(
+        'https://cdndirector.dailymotion.com/cdn/manifest/video/xbbtrw2.m3u8?sec=FAKETOKEN123&dmTs=997274',
+      );
+    });
+
+    test('without an auto master, picks the highest single-quality HLS ladder', () => {
+      const metadata = loadFixture('xfa1234');
+      expect(pickDailymotionMasterHls(metadata)?.href).toBe('https://cdndirector.dailymotion.com/cdn/m/fx-1080.m3u8?sec=FAKE1080');
+    });
+
+    test('returns undefined when only non-HLS qualities exist', () => {
+      expect(pickDailymotionMasterHls({ qualities: { '720': [{ type: 'video/mp4', url: 'https://x/video.mp4' }] } })).toBeUndefined();
+      expect(pickDailymotionMasterHls({})).toBeUndefined();
+      expect(pickDailymotionMasterHls(undefined)).toBeUndefined();
+    });
   });
 });
 

@@ -4,6 +4,7 @@ import { Agent as HttpsAgent, request as httpsRequest } from 'node:https';
 import { Request, Response, Router } from 'express';
 import winston from 'winston';
 import { envGet } from '../utils';
+import { DAILYMOTION_METADATA_HEADERS, pickDailymotionMasterHls } from '../extractor/Dailymotion';
 
 /**
  * MediaFlow Proxy relay.
@@ -93,11 +94,23 @@ export class MediaFlowProxyController {
     this.logger = logger;
 
     const proxyHandler = this.proxy.bind(this);
-    for (const prefix of ['/proxy/*splat', '/extractor/*splat', '/_token_*splat']) {
+    // RegExp routes: Express 4 (this project) does not understand the
+    // Express 5 `*splat` string syntax — the string form silently 404'd
+    // every relayed request. RegExp works on both major versions.
+    for (const prefix of [/^\/proxy\//, /^\/extractor\//, /^\/_token_/]) {
       this.router.get(prefix, proxyHandler);
       this.router.head(prefix, proxyHandler);
       this.router.options(prefix, proxyHandler);
     }
+
+    // Play-time Dailymotion resolver: the /stream response hands players this
+    // URL (no dailymotion calls are made at stream-resolution time — the CDN
+    // sec= token would be stale and the per-link rate limit wasted). When the
+    // player requests it, a FRESH manifest token is fetched and the player is
+    // 302-redirected to the MediaFlow HLS proxy with that fresh manifest.
+    const dmHandler = this.dailymotionResolver.bind(this);
+    this.router.get('/dm/:videoId.m3u8', dmHandler);
+    this.router.get('/dm/:videoId', dmHandler);
   }
 
   private upstreamBase(): string {
@@ -105,6 +118,83 @@ export class MediaFlowProxyController {
     if (!configured) return DEFAULT_UPSTREAM;
     if (configured.startsWith('http://') || configured.startsWith('https://')) return configured;
     return `http://${configured}`;
+  }
+
+  /**
+   * Play-time Dailymotion resolver (GET /dm/:videoId.m3u8).
+   *
+   * Fetches the player metadata (which issues a FRESH, short-lived `sec=`
+   * manifest token), picks the master HLS manifest, and 302-redirects the
+   * player to the MediaFlow HLS proxy wrapping that fresh manifest. Every
+   * play costs exactly one metadata call, and the token is never stale —
+   * the previous design (baking the manifest into the /stream response)
+   * died the moment the token expired and burned Dailymotion's per-link
+   * rate limit on retries.
+   */
+  private dailymotionResolver(req: Request, res: Response): void {
+    const videoId = String(req.params['videoId'] || '').replace(/\.m3u8$/i, '');
+    if (!/^[a-zA-Z0-9_-]{4,32}$/.test(videoId)) {
+      res.status(400).end('invalid dailymotion video id');
+      return;
+    }
+
+    const upstream = httpsRequest(
+      `https://www.dailymotion.com/player/metadata/video/${videoId}`,
+      { headers: { ...DAILYMOTION_METADATA_HEADERS, accept: 'application/json' } },
+      (upstreamRes: IncomingMessage) => {
+        if ((upstreamRes.statusCode ?? 500) >= 400) {
+          upstreamRes.resume();
+          this.logger.warn(`Dailymotion metadata HTTP ${upstreamRes.statusCode} for ${videoId}`);
+          res.status(502).end('dailymotion metadata unavailable');
+          return;
+        }
+
+        let data = '';
+        upstreamRes.setEncoding('utf8');
+        upstreamRes.on('data', (c: string) => { data += c; });
+        upstreamRes.on('end', () => {
+          let master: URL | undefined;
+          try {
+            master = pickDailymotionMasterHls(JSON.parse(data));
+          } catch (e) {
+            this.logger.warn(`Dailymotion metadata parse failed for ${videoId}: ${e}`);
+          }
+          if (!master) {
+            res.status(404).end('no dailymotion HLS manifest');
+            return;
+          }
+
+          res.setHeader('Cache-Control', 'no-store');
+          res.redirect(302, this.hlsProxyUrlFor(req, master).href);
+        });
+        upstreamRes.on('error', () => {
+          if (!res.headersSent) res.status(502).end('dailymotion metadata error');
+        });
+      },
+    );
+
+    upstream.on('error', (err) => {
+      this.logger.warn(`Dailymotion metadata request error for ${videoId}: ${err.message}`);
+      if (!res.headersSent) res.status(502).end('dailymotion metadata error');
+    });
+    upstream.end();
+  }
+
+  /** MediaFlow HLS-proxy URL for `master`, built on the PUBLIC host the player used
+   *  (x-forwarded aware, honours x-forwarded-prefix for reverse-proxied mounts). */
+  private hlsProxyUrlFor(req: Request, master: URL): URL {
+    const publicProto = firstForwarded(req.headers['x-forwarded-proto']) || req.protocol;
+    const publicHost = firstForwarded(req.headers['x-forwarded-host']) || req.headers.host || req.host;
+    const prefix = (firstForwarded(req.headers['x-forwarded-prefix']) || '').replace(/\/+$/, '');
+
+    const url = new URL(`${prefix}/proxy/hls/manifest.m3u8`, `${publicProto}://${publicHost}`);
+    const password = envGet('MEDIA_FLOW_PROXY_PASSWORD') || 'aetheria-link-secret';
+    url.searchParams.set('api_password', password);
+    url.searchParams.set('d', master.href);
+    for (const [name, value] of Object.entries(DAILYMOTION_METADATA_HEADERS)) {
+      url.searchParams.set('h_' + name.toLowerCase(), value);
+    }
+    return url;
   }
 
   private proxy(req: Request, res: Response): void {
@@ -122,8 +212,10 @@ export class MediaFlowProxyController {
 
     // Mirror exactly what utils/context.ts#resolveHostUrl does so the base
     // MFP rewrites segment URLs into matches the origin players use.
+    // req.headers.host (NOT express 4's req.host, which strips the port) so
+    // non-default ports survive into MFP's rewritten URLs.
     const publicProto = firstForwarded(req.headers['x-forwarded-proto']) || req.protocol;
-    const publicHost = firstForwarded(req.headers['x-forwarded-host']) || req.host;
+    const publicHost = firstForwarded(req.headers['x-forwarded-host']) || req.headers.host || req.host;
 
     const headers: Record<string, string> = {};
     for (const [name, value] of Object.entries(req.headers)) {
