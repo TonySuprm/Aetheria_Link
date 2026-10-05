@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process';
 import type { ChildProcess } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { createConnection } from 'node:net';
+import path from 'node:path';
 import type { Readable } from 'node:stream';
 import type { Logger } from 'winston';
 import { Context } from '../types';
@@ -146,6 +147,15 @@ export const buildMediaFlowProxyStreamUrl = (ctx: Context, url: URL, headers: Re
 // itself when nothing is listening (no-op when it is already running).
 const MFP_DEFAULT_URL = 'http://127.0.0.1:8889';
 const MFP_BINARY_CANDIDATES = ['/usr/local/bin/mediaflow-proxy-light', '/app/mediaflow-proxy-light'];
+
+// [halcyon patch] on-device (Halcyon) deployments: the musl static android
+// build ships via jniLibs exec-safe trick (like libffmpeg/libcloudflared) —
+// resolved at runtime from the worker-injected native bin dir.
+const MFP_NATIVE_CANDIDATE = (): string | undefined => {
+  const nativeBinDir = process.env['AETH_NATIVE_BIN_DIR'];
+  if (!nativeBinDir) return undefined;
+  return path.join(nativeBinDir, 'libmediaflow.so');
+};
 const MFP_PROBE_TIMEOUT_MS = 750;
 const MFP_READY_TIMEOUT_MS = 15_000;
 const MFP_MAX_RESTARTS = 5;
@@ -222,6 +232,9 @@ const spawnSupervisedProxy = (logger: Logger, binary: string, host: string, port
   // Pin the bind address to exactly the probed loopback target: the APP__*
   // form wins over both the config file and the compat env vars.
   env['APP__SERVER__HOST'] = host === 'localhost' ? '127.0.0.1' : host;
+  // [halcyon patch] auth parity: MFP must run with the SAME api_password the
+  // relay sends, and with it set the _token_ encrypted-URI scheme activates
+  if (!env['API_PASSWORD']) env['API_PASSWORD'] = envGet('MEDIA_FLOW_PROXY_PASSWORD') || 'aetheria-link-secret';
   env['APP__SERVER__PORT'] = String(port);
   if (!env['CONFIG_PATH'] && existsSync('/app/mediaflow-config.toml')) env['CONFIG_PATH'] = '/app/mediaflow-config.toml';
   env['RUST_LOG'] = env['RUST_LOG'] ?? 'info';
@@ -268,7 +281,9 @@ export const ensureEmbeddedMediaFlowProxy = async (logger: Logger): Promise<bool
     return true;
   }
 
-  const binary = envGet('MEDIA_FLOW_PROXY_BIN') ?? MFP_BINARY_CANDIDATES.find(candidate => existsSync(candidate));
+    const binary = envGet('MEDIA_FLOW_PROXY_BIN')
+    ?? (MFP_NATIVE_CANDIDATE() && existsSync(MFP_NATIVE_CANDIDATE() as string) ? MFP_NATIVE_CANDIDATE() : undefined)
+    ?? MFP_BINARY_CANDIDATES.find(candidate => existsSync(candidate));
   if (!binary) {
     logger.warn(`MediaFlow Proxy is not listening on ${host}:${port} and no bundled binary was found — MediaFlow Proxy streams (dailymotion, ok.ru, rumble, ...) will fail with 502. Deploy via the Dockerfile (supervisord) or start the proxy with start-all.ps1.`);
     return false;
