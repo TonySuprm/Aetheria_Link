@@ -322,7 +322,9 @@ const spawnSupervisedProxy = (logger: Logger, binary: string, host: string, port
     }
     logger.warn(`[mfp] exited (code=${code ?? '?'} signal=${signal ?? '?'}); restart ${nextAttempt}/${MFP_MAX_RESTARTS} in ${MFP_RESTART_DELAY_MS / 1000}s`);
     setTimeout(() => {
-      if (!supervisionShuttingDown) spawnSupervisedProxy(logger, binary, host, port, nextAttempt);
+      if (!supervisionShuttingDown) {
+        ensureSidecarDnsProxy(logger).then((dnsPort) => spawnSupervisedProxy(logger, binary, host, port, nextAttempt, dnsPort)).catch(() => { /* ignore */ });
+      }
     }, MFP_RESTART_DELAY_MS).unref();
   });
 };
@@ -361,7 +363,7 @@ export const ensureEmbeddedMediaFlowProxy = async (logger: Logger): Promise<bool
   }
 
   logger.info(`MediaFlow Proxy not reachable on ${host}:${port} — starting bundled binary ${binary}.`);
-  spawnSupervisedProxy(logger, binary, host, port, 1);
+  spawnSupervisedProxy(logger, binary, host, port, 1, await ensureSidecarDnsProxy(logger));
 
   const deadline = Date.now() + MFP_READY_TIMEOUT_MS;
   while (Date.now() < deadline) {
