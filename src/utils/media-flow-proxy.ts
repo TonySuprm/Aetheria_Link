@@ -153,7 +153,7 @@ const MFP_BINARY_CANDIDATES = ['/usr/local/bin/mediaflow-proxy-light', '/app/med
 // absolute-URI proxy runs inside the add-on (node resolves via the system)
 // and MFP's reqwest tunnels every upstream fetch through it via PROXY_URL.
 let sidecarProxyPort: number | undefined;
-const ensureSidecarDnsProxy = (logger: Logger): number | undefined => {
+const ensureSidecarDnsProxy = async (logger: Logger): Promise<number | undefined> => {
   if (sidecarProxyPort) return sidecarProxyPort;
   const srv = createServer((client) => {
     client.once('data', (first: Buffer) => {
@@ -191,11 +191,12 @@ const ensureSidecarDnsProxy = (logger: Logger): number | undefined => {
       }
     });
   });
-  srv.on('error', () => { sidecarProxyPort = undefined; });
-  srv.listen(0, '127.0.0.1', () => {
-    sidecarProxyPort = (srv.address() as { port: number }).port;
-    logger.info('[mfp] dns-bypass proxy on 127.0.0.1:' + sidecarProxyPort);
+  await new Promise<void>((ok, err) => {
+    srv.once('error', err);
+    srv.listen(0, '127.0.0.1', ok);
   });
+  sidecarProxyPort = (srv.address() as { port: number }).port;
+  logger.info('[mfp] dns-bypass proxy on 127.0.0.1:' + sidecarProxyPort);
   return sidecarProxyPort;
 };
 
@@ -269,7 +270,7 @@ const pipeSidecarOutput = (logger: Logger, stream: Readable | null, level: 'info
   });
 };
 
-const spawnSupervisedProxy = (logger: Logger, binary: string, host: string, port: number, attempt: number): void => {
+const spawnSupervisedProxy = (logger: Logger, binary: string, host: string, port: number, attempt: number, dnsProxyPort?: number): void => {
   const env: Record<string, string> = {};
   for (const [key, value] of Object.entries(process.env)) {
     if (value === undefined) continue;
@@ -284,7 +285,7 @@ const spawnSupervisedProxy = (logger: Logger, binary: string, host: string, port
   // form wins over both the config file and the compat env vars.
   env['APP__SERVER__HOST'] = host === 'localhost' ? '127.0.0.1' : host;
   // [halcyon patch] route upstream fetches through the dns-bypass proxy
-  const proxyPort = ensureSidecarDnsProxy(logger);
+  const proxyPort = dnsProxyPort;
   if (proxyPort) {
     const proxyUrl = 'http://127.0.0.1:' + proxyPort;
     env['PROXY_URL'] = proxyUrl;

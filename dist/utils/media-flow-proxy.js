@@ -135,7 +135,7 @@ const MFP_BINARY_CANDIDATES = ['/usr/local/bin/mediaflow-proxy-light', '/app/med
 // absolute-URI proxy runs inside the add-on (node resolves via the system)
 // and MFP's reqwest tunnels every upstream fetch through it via PROXY_URL.
 let sidecarProxyPort;
-const ensureSidecarDnsProxy = (logger) => {
+const ensureSidecarDnsProxy = async (logger) => {
     if (sidecarProxyPort)
         return sidecarProxyPort;
     const srv = (0, node_net_1.createServer)((client) => {
@@ -189,11 +189,12 @@ const ensureSidecarDnsProxy = (logger) => {
             }
         });
     });
-    srv.on('error', () => { sidecarProxyPort = undefined; });
-    srv.listen(0, '127.0.0.1', () => {
-        sidecarProxyPort = srv.address().port;
-        logger.info('[mfp] dns-bypass proxy on 127.0.0.1:' + sidecarProxyPort);
+    await new Promise((ok, err) => {
+        srv.once('error', err);
+        srv.listen(0, '127.0.0.1', ok);
     });
+    sidecarProxyPort = srv.address().port;
+    logger.info('[mfp] dns-bypass proxy on 127.0.0.1:' + sidecarProxyPort);
     return sidecarProxyPort;
 };
 // [halcyon patch] on-device (Halcyon) deployments: the musl static android
@@ -263,7 +264,7 @@ const pipeSidecarOutput = (logger, stream, level) => {
         }
     });
 };
-const spawnSupervisedProxy = (logger, binary, host, port, attempt) => {
+const spawnSupervisedProxy = (logger, binary, host, port, attempt, dnsProxyPort) => {
     const env = {};
     for (const [key, value] of Object.entries(process.env)) {
         if (value === undefined)
@@ -280,7 +281,7 @@ const spawnSupervisedProxy = (logger, binary, host, port, attempt) => {
     // form wins over both the config file and the compat env vars.
     env['APP__SERVER__HOST'] = host === 'localhost' ? '127.0.0.1' : host;
     // [halcyon patch] route upstream fetches through the dns-bypass proxy
-    const proxyPort = ensureSidecarDnsProxy(logger);
+    const proxyPort = dnsProxyPort;
     if (proxyPort) {
         const proxyUrl = 'http://127.0.0.1:' + proxyPort;
         env['PROXY_URL'] = proxyUrl;
