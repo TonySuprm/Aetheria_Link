@@ -903,6 +903,7 @@ const port = parseInt((0, utils_1.envGet)('PORT') || '51546');
     // without it every /proxy/* playback dies with ECONNREFUSED. Runs in the
     // background: it must never delay the /startup healthcheck.
     (0, utils_1.ensureEmbeddedMediaFlowProxy)(logger).catch((error) => logger.warn(`MediaFlow Proxy sidecar bootstrap failed: ${error instanceof Error ? error.message : String(error)}`));
+    (0, utils_1.startMediaFlowWatchdog)(logger);
     // Start listening immediately so Railway's /startup healthcheck passes
     // before any slow sidecars or pre-warms have finished. Bind to 0.0.0.0 so
     // Railway's IPv4-only internal routing can reach the port.

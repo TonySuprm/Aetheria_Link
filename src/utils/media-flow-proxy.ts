@@ -376,3 +376,21 @@ export const ensureEmbeddedMediaFlowProxy = async (logger: Logger): Promise<bool
   logger.warn(`MediaFlow Proxy did not accept connections on ${host}:${port} within ${MFP_READY_TIMEOUT_MS / 1000}s — see the [mfp] log lines above.`);
   return false;
 };
+
+// [halcyon patch] Sidecar liveness watchdog. When the add-on worker restarts
+// (redeploy / service restart), a previously spawned sidecar becomes an
+// orphan: the boot-time ensure() probes the port while the orphan is still
+// alive, skips spawning, and the orphan then dies on its broken stdout pipe —
+// leaving the loopback proxy dead until the next full restart. The watchdog
+// re-probes periodically and re-runs ensure() (idempotent: alive = no-op) so
+// the sidecar self-heals within one interval.
+let watchdogStarted = false;
+export const startMediaFlowWatchdog = (logger: Logger, intervalMs = 25_000): void => {
+  if (watchdogStarted) return;
+  watchdogStarted = true;
+  const timer = setInterval(() => {
+    ensureEmbeddedMediaFlowProxy(logger).catch(() => { /* per-run failures are logged inside */ });
+  }, intervalMs);
+  timer.unref?.();
+  logger.info('[mfp] liveness watchdog armed (25s interval)');
+};

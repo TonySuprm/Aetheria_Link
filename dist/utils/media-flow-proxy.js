@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ensureEmbeddedMediaFlowProxy = exports.probePort = exports.parseLoopbackProxyTarget = exports.buildMediaFlowProxyStreamUrl = exports.buildMediaFlowProxyHlsUrl = exports.buildMediaFlowProxyExtractorStreamUrl = exports.buildMediaFlowProxyExtractorRedirectUrl = exports.isEmbeddedMediaFlowProxy = exports.supportsMediaFlowProxy = void 0;
+exports.startMediaFlowWatchdog = exports.ensureEmbeddedMediaFlowProxy = exports.probePort = exports.parseLoopbackProxyTarget = exports.buildMediaFlowProxyStreamUrl = exports.buildMediaFlowProxyHlsUrl = exports.buildMediaFlowProxyExtractorStreamUrl = exports.buildMediaFlowProxyExtractorRedirectUrl = exports.isEmbeddedMediaFlowProxy = exports.supportsMediaFlowProxy = void 0;
 const node_child_process_1 = require("node:child_process");
 const node_fs_1 = require("node:fs");
 const node_net_1 = require("node:net");
@@ -369,3 +369,22 @@ const ensureEmbeddedMediaFlowProxy = async (logger) => {
     return false;
 };
 exports.ensureEmbeddedMediaFlowProxy = ensureEmbeddedMediaFlowProxy;
+// [halcyon patch] Sidecar liveness watchdog. When the add-on worker restarts
+// (redeploy / service restart), a previously spawned sidecar becomes an
+// orphan: the boot-time ensure() probes the port while the orphan is still
+// alive, skips spawning, and the orphan then dies on its broken stdout pipe —
+// leaving the loopback proxy dead until the next full restart. The watchdog
+// re-probes periodically and re-runs ensure() (idempotent: alive = no-op) so
+// the sidecar self-heals within one interval.
+let watchdogStarted = false;
+const startMediaFlowWatchdog = (logger, intervalMs = 25_000) => {
+    if (watchdogStarted)
+        return;
+    watchdogStarted = true;
+    const timer = setInterval(() => {
+        (0, exports.ensureEmbeddedMediaFlowProxy)(logger).catch(() => { });
+    }, intervalMs);
+    timer.unref?.();
+    logger.info('[mfp] liveness watchdog armed (25s interval)');
+};
+exports.startMediaFlowWatchdog = startMediaFlowWatchdog;
