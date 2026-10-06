@@ -4,6 +4,8 @@ import { Agent as HttpsAgent, request as httpsRequest } from 'node:https';
 import { Request, Response, Router } from 'express';
 import winston from 'winston';
 import { envGet } from '../utils';
+import path from 'node:path';
+import { existsSync } from 'node:fs';
 import { DAILYMOTION_METADATA_HEADERS, pickDailymotionMasterHls } from '../extractor/Dailymotion';
 
 /**
@@ -114,6 +116,13 @@ export class MediaFlowProxyController {
   }
 
   private upstreamBase(): string {
+    // [halcyon patch] the embedded sidecar (same device/network as the
+    // dailymotion sec= token) takes precedence over MEDIA_FLOW_PROXY_URL —
+    // a re-seed can reset that env to a remote MFP whose IP can never match.
+    const nativeBinDir = envGet('AETH_NATIVE_BIN_DIR') || process.env['AETH_NATIVE_BIN_DIR'];
+    if (nativeBinDir && existsSync(path.join(nativeBinDir, 'libmediaflow.so'))) {
+      return 'http://127.0.0.1:8889';
+    }
     const configured = envGet('MEDIA_FLOW_PROXY_URL')?.trim();
     if (!configured) return DEFAULT_UPSTREAM;
     if (configured.startsWith('http://') || configured.startsWith('https://')) return configured;

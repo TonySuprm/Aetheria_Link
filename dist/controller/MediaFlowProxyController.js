@@ -1,10 +1,15 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MediaFlowProxyController = void 0;
 const node_http_1 = require("node:http");
 const node_https_1 = require("node:https");
 const express_1 = require("express");
 const utils_1 = require("../utils");
+const node_path_1 = __importDefault(require("node:path"));
+const node_fs_1 = require("node:fs");
 const Dailymotion_1 = require("../extractor/Dailymotion");
 /**
  * MediaFlow Proxy relay.
@@ -103,6 +108,13 @@ class MediaFlowProxyController {
         this.router.get('/dm/:videoId', dmHandler);
     }
     upstreamBase() {
+        // [halcyon patch] the embedded sidecar (same device/network as the
+        // dailymotion sec= token) takes precedence over MEDIA_FLOW_PROXY_URL —
+        // a re-seed can reset that env to a remote MFP whose IP can never match.
+        const nativeBinDir = (0, utils_1.envGet)('AETH_NATIVE_BIN_DIR') || process.env['AETH_NATIVE_BIN_DIR'];
+        if (nativeBinDir && (0, node_fs_1.existsSync)(node_path_1.default.join(nativeBinDir, 'libmediaflow.so'))) {
+            return 'http://127.0.0.1:8889';
+        }
         const configured = (0, utils_1.envGet)('MEDIA_FLOW_PROXY_URL')?.trim();
         if (!configured)
             return DEFAULT_UPSTREAM;
