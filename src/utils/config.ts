@@ -2,6 +2,8 @@ import { Extractor } from '../extractor';
 import { Source } from '../source';
 import { Config } from '../types';
 import { envGet } from './env';
+import path from 'node:path';
+import { existsSync } from 'node:fs';
 
 export { envGet };
 
@@ -37,6 +39,17 @@ export const getConfigWithEnvFallback = (urlConfig?: Config): Config => {
     ...(envAlldebridApiKey && !baseConfig.alldebridApiKey && { alldebridApiKey: envAlldebridApiKey }),
     ...(envRealdebridApiKey && !baseConfig.realdebridApiKey && { realdebridApiKey: envRealdebridApiKey }),
   };
+
+  // [halcyon patch] on-device embedded sidecar WINS over every config layer
+  // (webui-saved config AND the per-request URL config segment): the
+  // Dailymotion manifest sec= token is bound to the fetching IP, so a remote
+  // MFP can never serve it — the co-located sidecar (same device/network) is
+  // the only valid MediaFlow for this deployment shape.
+  const nativeBinDir = envGet('AETH_NATIVE_BIN_DIR') || process.env['AETH_NATIVE_BIN_DIR'];
+  if (nativeBinDir && existsSync(path.join(nativeBinDir, 'libmediaflow.so'))) {
+    resolved.mediaFlowProxyUrl = 'http://127.0.0.1:8889';
+    if (!resolved.mediaFlowProxyPassword) resolved.mediaFlowProxyPassword = 'aetheria-link-secret';
+  }
 
   return resolved;
 };

@@ -122,6 +122,26 @@ try {
     if ((0, node_fs_1.existsSync)(persistedConfigPath)) {
         const saved = JSON.parse((0, node_fs_1.readFileSync)(persistedConfigPath, 'utf8'));
         if (saved && typeof saved === 'object' && Object.keys(saved).length > 0) {
+            // [halcyon patch] migrate stale remote MediaFlow URLs to the embedded
+            // sidecar on-device: the dailymotion sec= token is IP-bound, so a
+            // remote MFP (Railway) can never serve it — and the webui must not
+            // keep showing a URL that cannot work.
+            const nativeBinDir = (0, utils_1.envGet)('AETH_NATIVE_BIN_DIR') || process.env['AETH_NATIVE_BIN_DIR'];
+            if (nativeBinDir &&
+                (0, node_fs_1.existsSync)((0, node_path_1.join)(nativeBinDir, 'libmediaflow.so')) &&
+                typeof saved.mediaFlowProxyUrl === 'string' &&
+                !saved.mediaFlowProxyUrl.includes('127.0.0.1')) {
+                saved.mediaFlowProxyUrl = 'http://127.0.0.1:8889';
+                if (!saved.mediaFlowProxyPassword)
+                    saved.mediaFlowProxyPassword = 'aetheria-link-secret';
+                try {
+                    (0, node_fs_1.writeFileSync)(persistedConfigPath, JSON.stringify(saved, null, 2));
+                }
+                catch (e) {
+                    logger.warn(`Failed to persist migrated config: ${e}`);
+                }
+                logger.info('Migrated persisted mediaFlowProxyUrl to the embedded sidecar (http://127.0.0.1:8889)');
+            }
             exports.lastSyncedConfig = saved;
             pendingSyncConfig = saved;
             (0, syncedConfig_1.setSyncedConfig)(saved);

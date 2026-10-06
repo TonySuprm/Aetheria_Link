@@ -1,8 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isResolutionExcluded = exports.excludeResolutionConfigKey = exports.isSourceDisabled = exports.disableSourceConfigKey = exports.isExtractorDisabled = exports.disableExtractorConfigKey = exports.getDebridSuffix = exports.hasDebrid = exports.hasMultiEnabled = exports.showExternalUrls = exports.showErrors = exports.getConfigWithEnvFallback = exports.getDefaultConfig = exports.DEFAULT_DISABLED_SOURCE_IDS = exports.envGet = void 0;
 const env_1 = require("./env");
 Object.defineProperty(exports, "envGet", { enumerable: true, get: function () { return env_1.envGet; } });
+const node_path_1 = __importDefault(require("node:path"));
+const node_fs_1 = require("node:fs");
 /**
  * Sources turned OFF by default for fresh installs (no saved config). The user can still
  * re-enable them from the configure page; once enabled (key removed from the config URL)
@@ -32,6 +37,17 @@ const getConfigWithEnvFallback = (urlConfig) => {
         ...(envAlldebridApiKey && !baseConfig.alldebridApiKey && { alldebridApiKey: envAlldebridApiKey }),
         ...(envRealdebridApiKey && !baseConfig.realdebridApiKey && { realdebridApiKey: envRealdebridApiKey }),
     };
+    // [halcyon patch] on-device embedded sidecar WINS over every config layer
+    // (webui-saved config AND the per-request URL config segment): the
+    // Dailymotion manifest sec= token is bound to the fetching IP, so a remote
+    // MFP can never serve it — the co-located sidecar (same device/network) is
+    // the only valid MediaFlow for this deployment shape.
+    const nativeBinDir = (0, env_1.envGet)('AETH_NATIVE_BIN_DIR') || process.env['AETH_NATIVE_BIN_DIR'];
+    if (nativeBinDir && (0, node_fs_1.existsSync)(node_path_1.default.join(nativeBinDir, 'libmediaflow.so'))) {
+        resolved.mediaFlowProxyUrl = 'http://127.0.0.1:8889';
+        if (!resolved.mediaFlowProxyPassword)
+            resolved.mediaFlowProxyPassword = 'aetheria-link-secret';
+    }
     return resolved;
 };
 exports.getConfigWithEnvFallback = getConfigWithEnvFallback;
