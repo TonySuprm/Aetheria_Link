@@ -391,6 +391,5 @@ export const startMediaFlowWatchdog = (logger: Logger, intervalMs = 25_000): voi
   const timer = setInterval(() => {
     ensureEmbeddedMediaFlowProxy(logger).catch(() => { /* per-run failures are logged inside */ });
   }, intervalMs);
-  timer.unref?.();
   logger.info('[mfp] liveness watchdog armed (25s interval)');
 };
