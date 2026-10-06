@@ -337,7 +337,15 @@ const spawnSupervisedProxy = (logger: Logger, binary: string, host: string, port
  * skipped.
  */
 export const ensureEmbeddedMediaFlowProxy = async (logger: Logger): Promise<boolean> => {
-  const target = parseLoopbackProxyTarget(envGet('MEDIA_FLOW_PROXY_URL') ?? MFP_DEFAULT_URL);
+  // [halcyon patch] the embedded sidecar binary takes precedence: when it
+  // exists on-device, the sidecar MUST run (dailymotion's IP-bound token),
+  // regardless of what MEDIA_FLOW_PROXY_URL says (a stale Railway URL from a
+  // re-seed would silently skip the spawn and leave the proxy dead).
+  const sidecarBinDir = process.env['AETH_NATIVE_BIN_DIR'];
+  const sidecarUrl = sidecarBinDir && existsSync(path.join(sidecarBinDir, 'libmediaflow.so'))
+    ? 'http://127.0.0.1:8889'
+    : undefined;
+  const target = parseLoopbackProxyTarget(sidecarUrl ?? envGet('MEDIA_FLOW_PROXY_URL') ?? MFP_DEFAULT_URL);
   if (!target) return false; // external proxy or none configured: not ours to start
 
   const { host, port } = target;
@@ -388,7 +396,7 @@ let watchdogStarted = false;
 export const startMediaFlowWatchdog = (logger: Logger, intervalMs = 25_000): void => {
   if (watchdogStarted) return;
   watchdogStarted = true;
-  const timer = setInterval(() => {
+  setInterval(() => {
     ensureEmbeddedMediaFlowProxy(logger).catch(() => { /* per-run failures are logged inside */ });
   }, intervalMs);
   logger.info('[mfp] liveness watchdog armed (25s interval)');
