@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isResolutionExcluded = exports.excludeResolutionConfigKey = exports.isSourceDisabled = exports.disableSourceConfigKey = exports.isExtractorDisabled = exports.disableExtractorConfigKey = exports.getDebridSuffix = exports.hasDebrid = exports.hasMultiEnabled = exports.showExternalUrls = exports.showErrors = exports.getConfigWithEnvFallback = exports.getDefaultConfig = exports.DEFAULT_DISABLED_SOURCE_IDS = exports.envGet = void 0;
+exports.isResolutionExcluded = exports.excludeResolutionConfigKey = exports.isSourceDisabled = exports.disableSourceConfigKey = exports.isExtractorDisabled = exports.disableExtractorConfigKey = exports.getDebridSuffix = exports.hasDebrid = exports.hasMultiEnabled = exports.showExternalUrls = exports.showErrors = exports.getConfigWithEnvFallback = exports.forceEmbeddedMediaFlow = exports.embeddedMediaFlowAvailable = exports.EMBEDDED_MEDIAFLOW_URL = exports.getDefaultConfig = exports.DEFAULT_DISABLED_SOURCE_IDS = exports.envGet = void 0;
 const env_1 = require("./env");
 Object.defineProperty(exports, "envGet", { enumerable: true, get: function () { return env_1.envGet; } });
 const node_path_1 = __importDefault(require("node:path"));
@@ -24,6 +24,33 @@ const getDefaultConfig = () => {
     };
 };
 exports.getDefaultConfig = getDefaultConfig;
+exports.EMBEDDED_MEDIAFLOW_URL = 'http://127.0.0.1:8889';
+/**
+ * [halcyon patch] True when this instance co-runs the bundled MediaFlow Proxy
+ * sidecar (libmediaflow.so shipped via Halcyon jniLibs). When true, the
+ * sidecar is the ONLY valid MediaFlow for dailymotion (the manifest sec=
+ * token is IP-bound to the fetcher) — every config layer must resolve to it.
+ */
+const embeddedMediaFlowAvailable = () => {
+    const nativeBinDir = (0, env_1.envGet)('AETH_NATIVE_BIN_DIR') || process.env['AETH_NATIVE_BIN_DIR'];
+    return Boolean(nativeBinDir && (0, node_fs_1.existsSync)(node_path_1.default.join(nativeBinDir, 'libmediaflow.so')));
+};
+exports.embeddedMediaFlowAvailable = embeddedMediaFlowAvailable;
+/**
+ * [halcyon patch] Force the embedded sidecar URL onto a config object.
+ * Used on every config WRITE path (app-sync persistence, boot migration) so a
+ * stale remote MediaFlow URL — e.g. re-saved from the webui's localStorage —
+ * can never be persisted again on-device.
+ */
+const forceEmbeddedMediaFlow = (config) => {
+    if ((0, exports.embeddedMediaFlowAvailable)()) {
+        config.mediaFlowProxyUrl = exports.EMBEDDED_MEDIAFLOW_URL;
+        if (!config.mediaFlowProxyPassword)
+            config.mediaFlowProxyPassword = 'aetheria-link-secret';
+    }
+    return config;
+};
+exports.forceEmbeddedMediaFlow = forceEmbeddedMediaFlow;
 const getConfigWithEnvFallback = (urlConfig) => {
     const baseConfig = urlConfig ?? (0, exports.getDefaultConfig)();
     const envMediaFlowProxyUrl = (0, env_1.envGet)('MEDIA_FLOW_PROXY_URL');
@@ -42,13 +69,7 @@ const getConfigWithEnvFallback = (urlConfig) => {
     // Dailymotion manifest sec= token is bound to the fetching IP, so a remote
     // MFP can never serve it — the co-located sidecar (same device/network) is
     // the only valid MediaFlow for this deployment shape.
-    const nativeBinDir = (0, env_1.envGet)('AETH_NATIVE_BIN_DIR') || process.env['AETH_NATIVE_BIN_DIR'];
-    if (nativeBinDir && (0, node_fs_1.existsSync)(node_path_1.default.join(nativeBinDir, 'libmediaflow.so'))) {
-        resolved.mediaFlowProxyUrl = 'http://127.0.0.1:8889';
-        if (!resolved.mediaFlowProxyPassword)
-            resolved.mediaFlowProxyPassword = 'aetheria-link-secret';
-    }
-    return resolved;
+    return (0, exports.forceEmbeddedMediaFlow)(resolved);
 };
 exports.getConfigWithEnvFallback = getConfigWithEnvFallback;
 const showErrors = (config) => 'showErrors' in config;

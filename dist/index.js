@@ -126,12 +126,10 @@ try {
             // sidecar on-device: the dailymotion sec= token is IP-bound, so a
             // remote MFP (Railway) can never serve it — and the webui must not
             // keep showing a URL that cannot work.
-            const nativeBinDir = (0, utils_1.envGet)('AETH_NATIVE_BIN_DIR') || process.env['AETH_NATIVE_BIN_DIR'];
-            if (nativeBinDir &&
-                (0, node_fs_1.existsSync)((0, node_path_1.join)(nativeBinDir, 'libmediaflow.so')) &&
+            if ((0, config_1.embeddedMediaFlowAvailable)() &&
                 typeof saved.mediaFlowProxyUrl === 'string' &&
                 !saved.mediaFlowProxyUrl.includes('127.0.0.1')) {
-                saved.mediaFlowProxyUrl = 'http://127.0.0.1:8889';
+                saved.mediaFlowProxyUrl = config_1.EMBEDDED_MEDIAFLOW_URL;
                 if (!saved.mediaFlowProxyPassword)
                     saved.mediaFlowProxyPassword = 'aetheria-link-secret';
                 try {
@@ -163,6 +161,17 @@ addon.get('/app-sync', (_req, res) => {
 });
 addon.post('/app-sync', (req, res) => {
     if (req.body && Object.keys(req.body).length > 0) {
+        // [halcyon patch] the embedded sidecar is authoritative on-device: the
+        // webui re-saves whatever its localStorage holds, so a stale remote
+        // MediaFlow URL (Railway) would re-persist here after every "Save &
+        // Apply" and defeat the boot migration. Strip it at the write path.
+        if ((0, config_1.embeddedMediaFlowAvailable)() &&
+            typeof req.body.mediaFlowProxyUrl === 'string' &&
+            !req.body.mediaFlowProxyUrl.includes('127.0.0.1')) {
+            req.body.mediaFlowProxyUrl = config_1.EMBEDDED_MEDIAFLOW_URL;
+            if (!req.body.mediaFlowProxyPassword)
+                req.body.mediaFlowProxyPassword = 'aetheria-link-secret';
+        }
         pendingSyncConfig = req.body;
         exports.lastSyncedConfig = req.body;
         (0, syncedConfig_1.setSyncedConfig)(req.body);
@@ -182,8 +191,10 @@ addon.post('/app-sync', (req, res) => {
 // Persisted config mirror for the main Aetheria Prime process to poll.
 // The configure page only pushes to /app-sync; this endpoint lets the app
 // reliably fetch the latest config even if an IPC message was missed.
+// Returns the EFFECTIVE config (sidecar-forced on-device), never the raw
+// persisted values, so nothing polling it can read back a dead remote URL.
 addon.get('/config', (_req, res) => {
-    res.json(exports.lastSyncedConfig || {});
+    res.json(exports.lastSyncedConfig && Object.keys(exports.lastSyncedConfig).length > 0 ? (0, config_1.getConfigWithEnvFallback)(exports.lastSyncedConfig) : {});
 });
 const node_child_process_1 = require("node:child_process");
 addon.get('/debug-mediaflow', (_req, res) => {

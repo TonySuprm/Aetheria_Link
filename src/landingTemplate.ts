@@ -903,11 +903,15 @@ mountToggles('.hud-toggle');
     cb.checked = cb.name in saved;
   });
 
-  /* Text inputs: proxy + debrid keys */
+  /* Text inputs: proxy + debrid keys. The server-rendered value is
+     authoritative — on Halcyon the MediaFlow field always carries the
+     embedded sidecar URL, and letting a stale localStorage value (e.g. a
+     dead remote MFP) overwrite it made the form show — and re-save — a
+     proxy that can never work. Only fill inputs the server left empty. */
   ['mediaFlowProxyUrl', 'mediaFlowProxyPassword', 'alldebridApiKey', 'realdebridApiKey'].forEach(function(k) {
     if (saved[k]) {
       var inp = form.querySelector('[name="' + k + '"]');
-      if (inp) inp.value = saved[k];
+      if (inp && !inp.value) inp.value = saved[k];
     }
   });
 })();
