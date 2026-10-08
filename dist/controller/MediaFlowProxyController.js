@@ -16,8 +16,8 @@ const Dailymotion_1 = require("../extractor/Dailymotion");
 /**
  * MediaFlow Proxy relay.
  *
- * The add-on co-runs bundled MediaFlow Proxy (MFP) on loopback (Railway runs
- * both in one container; start-all.ps1 runs both locally). MFP resolves
+ * The add-on co-runs bundled MediaFlow Proxy (MFP) on loopback (start-all.ps1
+ * runs both locally). MFP resolves
  * dailymotion / ok.ru / rumble / doodstream / ... into header-injected HLS or
  * plain stream URLs — but loopback is unreachable by Stremio players, and MFP
  * can fetch those CDNs only because it injects the UA/Referer itself.
@@ -205,7 +205,7 @@ class MediaFlowProxyController {
         // The manifest itself will be fetched BY MediaFlow — so the metadata MUST
         // be fetched through MediaFlow too (its /proxy/stream relays the request
         // from MFP's own IP), otherwise the token is issued to this add-on's IP
-        // and MFP's fetch 403s. This is what makes the Railway-hosted MFP work.
+        // and MFP's fetch 403s. This is what makes a co-located MFP work.
         const viaProxyUrl = new URL('/proxy/stream', this.upstreamBase());
         viaProxyUrl.searchParams.set('api_password', (0, utils_1.envGet)('MEDIA_FLOW_PROXY_PASSWORD') || 'aetheria-link-secret');
         viaProxyUrl.searchParams.set('d', metadataUrl.href);

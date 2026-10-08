@@ -16,7 +16,7 @@ const configProtocol = (value) => value.toLowerCase().startsWith('https://') ? '
 const LOOPBACK_PROXY_HOSTS = new Set(['localhost', '127.0.0.1', '0.0.0.0', '[::1]', '::1']);
 /**
  * True when the configured MediaFlow Proxy is the embedded, co-running instance
- * (Railway/docker-compose/sidecar on loopback). Such a proxy has no address
+ * (docker-compose/sidecar on loopback). Such a proxy has no address
  * reachable by Stremio players, so client-facing URLs must be exposed through
  * the add-on's own public host (relayed by MediaFlowProxyController).
  */
@@ -121,13 +121,12 @@ const buildMediaFlowProxyStreamUrl = (ctx, url, headers = {}) => {
 };
 exports.buildMediaFlowProxyStreamUrl = buildMediaFlowProxyStreamUrl;
 // ── Embedded MediaFlow Proxy sidecar ──────────────────────────────────────
-// In the bundled Railway image the proxy co-runs on loopback and
-// railway-aetheria.sh (via supervisord) starts it before `npm start`. But a
-// Procfile/service start-command override makes Railway run a bare
-// `npm start` instead, skipping supervisord entirely — every /proxy/*
-// playback then dies with ECONNREFUSED. As a safety net the add-on probes
-// the configured loopback proxy at startup and spawns the bundled binary
-// itself when nothing is listening (no-op when it is already running).
+// The proxy is expected to co-run on loopback, started before `npm start`
+// by a supervisor script. When a host starts the process directly instead,
+// every /proxy/* playback would die with ECONNREFUSED. As a safety net the
+// add-on probes the configured loopback proxy at startup and spawns the
+// bundled binary itself when nothing is listening (no-op when it is
+// already running).
 const MFP_DEFAULT_URL = 'http://127.0.0.1:8889';
 const MFP_BINARY_CANDIDATES = ['/usr/local/bin/mediaflow-proxy-light', '/app/mediaflow-proxy-light'];
 // [halcyon patch] musl static binaries cannot resolve DNS on Android (no
@@ -335,7 +334,7 @@ const spawnSupervisedProxy = (logger, binary, host, port, attempt, dnsProxyPort)
 const ensureEmbeddedMediaFlowProxy = async (logger) => {
     // [halcyon patch] the embedded sidecar binary takes precedence: when it
     // exists on-device, the sidecar MUST run (dailymotion's IP-bound token),
-    // regardless of what MEDIA_FLOW_PROXY_URL says (a stale Railway URL from a
+    // regardless of what MEDIA_FLOW_PROXY_URL says (a stale remote URL from a
     // re-seed would silently skip the spawn and leave the proxy dead).
     const sidecarBinDir = process.env['AETH_NATIVE_BIN_DIR'];
     const sidecarUrl = sidecarBinDir && (0, node_fs_1.existsSync)(node_path_1.default.join(sidecarBinDir, 'libmediaflow.so'))

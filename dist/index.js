@@ -124,8 +124,8 @@ try {
         if (saved && typeof saved === 'object' && Object.keys(saved).length > 0) {
             // [halcyon patch] migrate stale remote MediaFlow URLs to the embedded
             // sidecar on-device: the dailymotion sec= token is IP-bound, so a
-            // remote MFP (Railway) can never serve it — and the webui must not
-            // keep showing a URL that cannot work.
+            // remote MFP can never serve it — and the webui must not keep showing
+            // a URL that cannot work.
             if ((0, config_1.embeddedMediaFlowAvailable)() &&
                 typeof saved.mediaFlowProxyUrl === 'string' &&
                 !saved.mediaFlowProxyUrl.includes('127.0.0.1')) {
@@ -163,8 +163,8 @@ addon.post('/app-sync', (req, res) => {
     if (req.body && Object.keys(req.body).length > 0) {
         // [halcyon patch] the embedded sidecar is authoritative on-device: the
         // webui re-saves whatever its localStorage holds, so a stale remote
-        // MediaFlow URL (Railway) would re-persist here after every "Save &
-        // Apply" and defeat the boot migration. Strip it at the write path.
+        // MediaFlow URL would re-persist here after every "Save & Apply" and
+        // defeat the boot migration. Strip it at the write path.
         if ((0, config_1.embeddedMediaFlowAvailable)() &&
             typeof req.body.mediaFlowProxyUrl === 'string' &&
             !req.body.mediaFlowProxyUrl.includes('127.0.0.1')) {
@@ -909,15 +909,14 @@ const port = parseInt((0, utils_1.envGet)('PORT') || '51546');
         config: (0, config_1.getConfigWithEnvFallback)(undefined),
     };
     // Guarantee the embedded MediaFlow Proxy sidecar is up even when the
-    // container starts with a bare `npm start` (Railway Procfile/service
-    // start-command override) that skips supervisord/railway-aetheria.sh —
-    // without it every /proxy/* playback dies with ECONNREFUSED. Runs in the
+    // host starts the process directly (no supervisor script) — without it
+    // every /proxy/* playback dies with ECONNREFUSED. Runs in the
     // background: it must never delay the /startup healthcheck.
     (0, utils_1.ensureEmbeddedMediaFlowProxy)(logger).catch((error) => logger.warn(`MediaFlow Proxy sidecar bootstrap failed: ${error instanceof Error ? error.message : String(error)}`));
     (0, utils_1.startMediaFlowWatchdog)(logger);
-    // Start listening immediately so Railway's /startup healthcheck passes
-    // before any slow sidecars or pre-warms have finished. Bind to 0.0.0.0 so
-    // Railway's IPv4-only internal routing can reach the port.
+    // Start listening immediately so the /startup healthcheck passes before
+    // any slow sidecars or pre-warms have finished. Bind to 0.0.0.0 so
+    // IPv4-only clients can always reach the port.
     addon.listen(port, '0.0.0.0', () => {
         logger.info(`Add-on Repository URL: http://0.0.0.0:${port}/manifest.json (BOUND)`);
     });
@@ -937,7 +936,7 @@ const port = parseInt((0, utils_1.envGet)('PORT') || '51546');
     }
     // Pre-warm "critical" sources so the first requests already see populated
     // caches. This is run in the background because it can take 10s-60s on a
-    // cold Railway container, and we must answer the /startup probe first.
+    // cold start, and we must answer the /startup probe first.
     const criticalSourceIds = new Set();
     if ((0, utils_1.envGet)('FLARESOLVERR_ENDPOINT')) {
         criticalSourceIds.add('ddlvalley');
