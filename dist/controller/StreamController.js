@@ -105,6 +105,9 @@ class StreamController {
         try {
             const { streams, ttl } = await resolution;
             this.logger.info(`[TIMING] StreamController: resolver returned ${streams.length} streams. Sending response...`, { requestId: rawId });
+            // extract dm ids BEFORE the direct-URL rewrite (it removes the /dm/<id>.m3u8
+            // pattern this extraction matches)
+            const dmIds = this.dailymotionIds(streams);
             this.rewriteDailymotionUrls(req, streams);
             if (ttl && (0, utils_1.envIsProd)()) {
                 res.setHeader('Cache-Control', `public, max-age=${Math.floor(ttl / 1000)}`);
@@ -112,7 +115,7 @@ class StreamController {
             res.setHeader('Content-Type', 'application/json');
             res.send(JSON.stringify({ streams }));
             this.logger.info(`[TIMING] StreamController: res.send() completed`, { requestId: rawId });
-            this.warmDailymotion(streams);
+            this.warmDailymotion(dmIds);
         }
         catch (error) {
             // resolve() never throws under normal operation (per-source errors are caught), but guard
@@ -152,18 +155,8 @@ class StreamController {
             stream.url = `${base}/dm/fetch?u=${encodeURIComponent(target)}&b=${encodeURIComponent(base)}${match[3] || ''}`;
         }
     }
-    /**
-     * Fast-start prefetch for dailymotion streams: ask the on-device ytdlp
-     * bridge to resolve the video and pre-cache the top variants' first segments
-     * NOW (fire-and-forget), so clicking Play starts in ~1s instead of ~10s —
-     * without it every play pays a ~4-5s metadata+master resolve through
-     * yt-dlp's networking before the player sees a manifest. On-device only
-     * (the bridge lives at 127.0.0.1:10003 next to the addon); deduped 30min.
-     */
-    warmDailymotion(streams) {
-        const onDevice = (0, utils_1.envGet)('AETH_NATIVE_BIN_DIR') || process.env['AETH_NATIVE_BIN_DIR'];
-        if (!onDevice)
-            return;
+    /** Dailymotion video ids referenced by this /stream response (pre-rewrite). */
+    dailymotionIds(streams) {
         const ids = [];
         for (const stream of streams) {
             const match = /\/dm\/([a-zA-Z0-9_-]+)\.m3u8/.exec(String(stream.url || ''));
@@ -172,6 +165,24 @@ class StreamController {
                 ids.push(id);
             if (ids.length >= 2)
                 break;
+        }
+        return ids;
+    }
+    /**
+     * Fast-start prefetch for dailymotion streams: ask the on-device ytdlp
+     * bridge to resolve the video and pre-cache every variant's init+first
+     * segments NOW (fire-and-forget), so clicking Play starts in ~1s instead of
+     * ~10s — without it every play pays a ~4-5s metadata+master resolve through
+     * yt-dlp's networking before the player sees a manifest. On-device only
+     * (the bridge lives at 127.0.0.1:10003 next to the addon); deduped 30min.
+     */
+    warmDailymotion(ids) {
+        if (!ids.length)
+            return;
+        const onDevice = (0, utils_1.envGet)('AETH_NATIVE_BIN_DIR') || process.env['AETH_NATIVE_BIN_DIR'];
+        if (!onDevice) {
+            this.logger.info('[dm-warm] skipped — not on-device');
+            return;
         }
         const base = ((0, utils_1.envGet)('YTDLP_BRIDGE_URL') || 'http://127.0.0.1:10003').replace(/\/+$/, '');
         for (const id of ids) {
