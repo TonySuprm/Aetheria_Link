@@ -125,18 +125,41 @@ class MediaFlowProxyController {
     /**
      * Play-time Dailymotion resolver (GET /dm/:videoId.m3u8).
      *
-     * Fetches the player metadata (which issues a FRESH, short-lived `sec=`
-     * manifest token), picks the master HLS manifest, and 302-redirects the
-     * player to the MediaFlow HLS proxy wrapping that fresh manifest. Every
-     * play costs exactly one metadata call, and the token is never stale —
-     * the previous design (baking the manifest into the /stream response)
-     * died the moment the token expired and burned Dailymotion's per-link
-     * rate limit on retries.
+     * DEFAULT (dmViaYtdlp): 302 to the on-device ytdlp bridge
+     * (`<host>/s/ytdlp/dm/fetch`), which resolves the video through yt-dlp,
+     * fetches manifest/variants/segments through yt-dlp's own networking, and
+     * rewrites every dailymotion URL to itself. This replaced the MediaFlow
+     * metadata chain because Dailymotion's CDN started returning 403 E005
+     * (non-browser TLS fingerprint) to MFP's rustls client — while yt-dlp's
+     * networking still passes. Bonus: yt-dlp exposes the 4K/AV1 ladders and
+     * caches resolutions for 5h instead of one metadata hit per play.
+     *
+     * FALLBACK (DM_VIA_YTDLP=0): the original MediaFlow metadata path — fetch a
+     * fresh `sec=` token via MFP and 302 to the MFP HLS proxy. Kept behind a
+     * kill-switch in case the bridge is unavailable.
      */
     dailymotionResolver(req, res) {
         const videoId = String(req.params['videoId'] || '').replace(/\.m3u8$/i, '');
         if (!/^[a-zA-Z0-9_-]{4,32}$/.test(videoId)) {
             res.status(400).end('invalid dailymotion video id');
+            return;
+        }
+        if ((0, utils_1.envGet)('DM_VIA_YTDLP') !== '0') {
+            const proto = firstForwarded(req.headers['x-forwarded-proto']) || req.protocol;
+            const host = String(firstForwarded(req.headers['x-forwarded-host']) || req.headers.host || req.host);
+            // The gateway path-mounts every service under /s/<name> on any host that
+            // reaches it (subdomain or LAN), so same-host keeps the player's origin
+            // and TLS. Direct addon-port access (dev) can't serve /s/ — point at the
+            // gateway port instead. YTDLP_PUBLIC_URL overrides everything.
+            const override = (0, utils_1.envGet)('YTDLP_PUBLIC_URL');
+            const hostNoPort = host.split(':')[0] || host;
+            const lanDirect = /^[^:]+:\d+$/.test(host) && /^\d+\.\d+\.\d+\.\d+$/.test(hostNoPort);
+            const base = override
+                || (lanDirect ? `${proto}://${hostNoPort}:8787/s/ytdlp` : `${proto}://${host}/s/ytdlp`);
+            const target = `https://www.dailymotion.com/video/${videoId}`;
+            const h = Buffer.from(JSON.stringify(Dailymotion_1.DAILYMOTION_METADATA_HEADERS)).toString('base64');
+            res.setHeader('Cache-Control', 'no-store');
+            res.redirect(302, `${base}/dm/fetch?u=${encodeURIComponent(target)}&h=${encodeURIComponent(h)}&b=${encodeURIComponent(base)}`);
             return;
         }
         const metadataUrl = new URL(`https://www.dailymotion.com/player/metadata/video/${videoId}`);
