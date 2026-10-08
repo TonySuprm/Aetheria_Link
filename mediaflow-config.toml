@@ -1,4 +1,4 @@
-# MediaFlow Proxy Light — runtime configuration for Aetheria Link/Railway.
+# MediaFlow Proxy Light — runtime configuration for Aetheria Link.
 # Copy of config-example.toml tuned for the bundled Docker image.
 
 [server]
