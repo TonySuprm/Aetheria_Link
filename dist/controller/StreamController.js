@@ -2,7 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StreamController = void 0;
 const express_1 = require("express");
+const node_http_1 = require("node:http");
 const utils_1 = require("../utils");
+const MediaFlowProxyController_1 = require("./MediaFlowProxyController");
 /**
  * Hard cap on how long sources may keep running in the background AFTER the response has been sent.
  * The stream response is returned at the STREAM_MAX_MS deadline with whatever sources finished by
@@ -27,6 +29,9 @@ class StreamController {
     // StreamResolver). Cleared once the shared promise settles.
     inFlight = new Map();
     progress = new Map();
+    // dailymotion ids already warm-requested (30min dedupe so /stream retries
+    // and Stremio re-polls don't burn extra resolves against the rate limit)
+    dmWarmAt = new Map();
     constructor(logger, sources, streams) {
         this.router = (0, express_1.Router)();
         this.logger = logger;
@@ -100,12 +105,14 @@ class StreamController {
         try {
             const { streams, ttl } = await resolution;
             this.logger.info(`[TIMING] StreamController: resolver returned ${streams.length} streams. Sending response...`, { requestId: rawId });
+            this.rewriteDailymotionUrls(req, streams);
             if (ttl && (0, utils_1.envIsProd)()) {
                 res.setHeader('Cache-Control', `public, max-age=${Math.floor(ttl / 1000)}`);
             }
             res.setHeader('Content-Type', 'application/json');
             res.send(JSON.stringify({ streams }));
             this.logger.info(`[TIMING] StreamController: res.send() completed`, { requestId: rawId });
+            this.warmDailymotion(streams);
         }
         catch (error) {
             // resolve() never throws under normal operation (per-source errors are caught), but guard
@@ -125,6 +132,60 @@ class StreamController {
         }
     }
     ;
+    /**
+     * Point dailymotion streams STRAIGHT at the ytdlp bridge, skipping this
+     * add-on's /dm 302 hop — one fewer Cloudflare round trip (~2s) before the
+     * first frame. The bridge's /dm/fetch serves the same rewritten playlist the
+     * 302 target does (and tolerates the /s/ytdlp prefix). Kill-switch
+     * DM_VIA_YTDLP=0 restores the /dm resolver URLs untouched.
+     */
+    rewriteDailymotionUrls(req, streams) {
+        if ((0, utils_1.envGet)('DM_VIA_YTDLP') === '0')
+            return;
+        const base = (0, MediaFlowProxyController_1.ytdlpPublicBase)(req);
+        for (const stream of streams) {
+            const url = String(stream.url || '');
+            const match = /^(https?:\/\/[^/]+)\/dm\/([a-zA-Z0-9_-]+)\.m3u8(#.*)?$/.exec(url);
+            if (!match)
+                continue;
+            const target = `https://www.dailymotion.com/video/${match[2]}`;
+            stream.url = `${base}/dm/fetch?u=${encodeURIComponent(target)}&b=${encodeURIComponent(base)}${match[3] || ''}`;
+        }
+    }
+    /**
+     * Fast-start prefetch for dailymotion streams: ask the on-device ytdlp
+     * bridge to resolve the video and pre-cache the top variants' first segments
+     * NOW (fire-and-forget), so clicking Play starts in ~1s instead of ~10s —
+     * without it every play pays a ~4-5s metadata+master resolve through
+     * yt-dlp's networking before the player sees a manifest. On-device only
+     * (the bridge lives at 127.0.0.1:10003 next to the addon); deduped 30min.
+     */
+    warmDailymotion(streams) {
+        const onDevice = (0, utils_1.envGet)('AETH_NATIVE_BIN_DIR') || process.env['AETH_NATIVE_BIN_DIR'];
+        if (!onDevice)
+            return;
+        const ids = [];
+        for (const stream of streams) {
+            const match = /\/dm\/([a-zA-Z0-9_-]+)\.m3u8/.exec(String(stream.url || ''));
+            const id = match?.[1];
+            if (id && !ids.includes(id))
+                ids.push(id);
+            if (ids.length >= 2)
+                break;
+        }
+        const base = ((0, utils_1.envGet)('YTDLP_BRIDGE_URL') || 'http://127.0.0.1:10003').replace(/\/+$/, '');
+        for (const id of ids) {
+            if (Date.now() - (this.dmWarmAt.get(id) || 0) < 30 * 60_000)
+                continue;
+            this.dmWarmAt.set(id, Date.now());
+            const req = (0, node_http_1.get)(`${base}/dm/warm?id=${encodeURIComponent(id)}`, { timeout: 60_000 }, (up) => {
+                up.resume();
+                this.logger.info(`[dm-warm] ${id} → HTTP ${up.statusCode}`);
+            });
+            req.on('timeout', () => req.destroy());
+            req.on('error', () => { });
+        }
+    }
     startResolution(ctx, sources, type, id, dedupeKey) {
         this.progress.set(dedupeKey, { completed: 0, total: sources.length, label: 'Scraping sources...' });
         const promise = this.streamResolver.resolve(ctx, sources, type, id, (completed, total, label) => {

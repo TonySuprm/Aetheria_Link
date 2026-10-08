@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MediaFlowProxyController = void 0;
+exports.ytdlpPublicBase = ytdlpPublicBase;
 const node_http_1 = require("node:http");
 const node_https_1 = require("node:https");
 const express_1 = require("express");
@@ -83,6 +84,37 @@ const firstForwarded = (value) => {
     const first = raw?.split(',')[0]?.trim();
     return first || undefined;
 };
+/**
+ * Where can a PLAYER reach the ytdlp bridge's /dm/fetch, given the request the
+ * player made to this add-on?
+ *   • LAN <ip>:<port> — the add-on was reached directly on its service port;
+ *     the gateway (:8787) path-mounts every service under /s/<name>.
+ *   • ≥3-label host (service subdomain `aetheria-link-mobile.<zone>` or the
+ *     gateway host `aeth.<zone>`) — Cloudflare's tunnel ingress maps
+ *     `<service>.<zone>` STRAIGHT to the service port, bypassing the gateway,
+ *     so /s/<name> is unreachable there; the ytdlp service's own public
+ *     subdomain is the correct target (it also tolerates the /s/ytdlp prefix,
+ *     which it strips).
+ *   • ≤2-label host (zone apex, localhost dev) — routes at the gateway, so the
+ *     /s/<name> path-mount works as-is.
+ * YTDLP_PUBLIC_URL overrides everything.
+ */
+function ytdlpPublicBase(req) {
+    const override = (0, utils_1.envGet)('YTDLP_PUBLIC_URL');
+    if (override)
+        return override.replace(/\/+$/, '');
+    const proto = firstForwarded(req.headers['x-forwarded-proto']) || req.protocol;
+    const host = String(firstForwarded(req.headers['x-forwarded-host']) || req.headers.host || req.host);
+    const hostNoPort = host.split(':')[0] || host;
+    const lanDirect = /^[^:]+:\d+$/.test(host) && /^\d+\.\d+\.\d+\.\d+$/.test(hostNoPort);
+    const labels = hostNoPort.split('.').filter(Boolean);
+    const zone = labels.length >= 3 ? labels.slice(1).join('.') : '';
+    if (lanDirect)
+        return `${proto}://${hostNoPort}:8787/s/ytdlp`;
+    if (zone)
+        return `https://ytdlp.${zone}`;
+    return `${proto}://${host}/s/ytdlp`;
+}
 class MediaFlowProxyController {
     router;
     logger;
@@ -145,29 +177,7 @@ class MediaFlowProxyController {
             return;
         }
         if ((0, utils_1.envGet)('DM_VIA_YTDLP') !== '0') {
-            const proto = firstForwarded(req.headers['x-forwarded-proto']) || req.protocol;
-            const host = String(firstForwarded(req.headers['x-forwarded-host']) || req.headers.host || req.host);
-            // Where can the player reach the ytdlp bridge's /dm/fetch?
-            //   • LAN <ip>:<port> — the addon was reached directly on its service
-            //     port; the gateway (:8787) path-mounts every service under /s/<name>.
-            //   • ≥3-label host (service subdomain `aetheria-link-mobile.<zone>` or
-            //     gateway host `aeth.<zone>`) — Cloudflare's tunnel ingress maps
-            //     `<service>.<zone>` STRAIGHT to the service port, bypassing the
-            //     gateway, so /s/<name> is unreachable there; the ytdlp service's own
-            //     public subdomain is the correct target (it also tolerates the
-            //     /s/ytdlp prefix, which it strips).
-            //   • ≤2-label host (zone apex, localhost dev) — routes at the gateway,
-            //     so the /s/<name> path-mount works as-is.
-            // YTDLP_PUBLIC_URL overrides everything.
-            const override = (0, utils_1.envGet)('YTDLP_PUBLIC_URL');
-            const hostNoPort = host.split(':')[0] || host;
-            const lanDirect = /^[^:]+:\d+$/.test(host) && /^\d+\.\d+\.\d+\.\d+$/.test(hostNoPort);
-            const labels = hostNoPort.split('.').filter(Boolean);
-            const zone = labels.length >= 3 ? labels.slice(1).join('.') : '';
-            const base = override
-                || (lanDirect ? `${proto}://${hostNoPort}:8787/s/ytdlp`
-                    : zone ? `https://ytdlp.${zone}`
-                        : `${proto}://${host}/s/ytdlp`);
+            const base = ytdlpPublicBase(req);
             const target = `https://www.dailymotion.com/video/${videoId}`;
             res.setHeader('Cache-Control', 'no-store');
             res.redirect(302, `${base}/dm/fetch?u=${encodeURIComponent(target)}&b=${encodeURIComponent(base)}`);
