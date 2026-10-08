@@ -180,10 +180,10 @@ class StreamController {
             this.dmWarmAt.set(id, Date.now());
             const req = (0, node_http_1.get)(`${base}/dm/warm?id=${encodeURIComponent(id)}`, { timeout: 60_000 }, (up) => {
                 up.resume();
-                this.logger.info(`[dm-warm] ${id} → HTTP ${up.statusCode}`);
+                this.logger.info(`[dm-warm] ${id} → HTTP ${up.statusCode} (${base})`);
             });
-            req.on('timeout', () => req.destroy());
-            req.on('error', () => { });
+            req.on('timeout', () => { this.logger.warn(`[dm-warm] ${id} → timeout`); req.destroy(); });
+            req.on('error', (e) => this.logger.warn(`[dm-warm] ${id} → ${e.message}`));
         }
     }
     startResolution(ctx, sources, type, id, dedupeKey) {

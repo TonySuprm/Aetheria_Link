@@ -194,10 +194,10 @@ export class StreamController {
       this.dmWarmAt.set(id, Date.now());
       const req = httpGet(`${base}/dm/warm?id=${encodeURIComponent(id)}`, { timeout: 60_000 }, (up: IncomingMessage) => {
         up.resume();
-        this.logger.info(`[dm-warm] ${id} → HTTP ${up.statusCode}`);
+        this.logger.info(`[dm-warm] ${id} → HTTP ${up.statusCode} (${base})`);
       });
-      req.on('timeout', () => req.destroy());
-      req.on('error', () => { /* best-effort */ });
+      req.on('timeout', () => { this.logger.warn(`[dm-warm] ${id} → timeout`); req.destroy(); });
+      req.on('error', (e) => this.logger.warn(`[dm-warm] ${id} → ${e.message}`));
     }
   }
 
