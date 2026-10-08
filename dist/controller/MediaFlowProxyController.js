@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MediaFlowProxyController = void 0;
 exports.ytdlpPublicBase = ytdlpPublicBase;
+exports.dmMaxHeight = dmMaxHeight;
 const node_http_1 = require("node:http");
 const node_https_1 = require("node:https");
 const express_1 = require("express");
@@ -115,6 +116,19 @@ function ytdlpPublicBase(req) {
         return `https://ytdlp.${zone}`;
     return `${proto}://${host}/s/ytdlp`;
 }
+/**
+ * Dailymotion ladder cap served to players. Default 2160 = full 4K ladder
+ * (h264 kept, AV1 dropped by the bridge's filter for player compat). Every dm
+ * byte flows through the phone's upload link (measured 2-6 Mbps behind a VPN
+ * vs 12-20 Mbps for 1440/2160) — if top-selecting players (mpv/libVLC) stall
+ * for minutes before the first frame or rebuffer constantly, lower this:
+ * DM_MAX_HEIGHT=1080 starts in seconds, 720 streams rock-solid on slow links.
+ */
+function dmMaxHeight() {
+    const raw = (0, utils_1.envGet)('DM_MAX_HEIGHT');
+    const parsed = raw ? parseInt(raw, 10) : 2160;
+    return Number.isFinite(parsed) && parsed >= 0 ? parsed : 2160;
+}
 class MediaFlowProxyController {
     router;
     logger;
@@ -179,8 +193,10 @@ class MediaFlowProxyController {
         if ((0, utils_1.envGet)('DM_VIA_YTDLP') !== '0') {
             const base = ytdlpPublicBase(req);
             const target = `https://www.dailymotion.com/video/${videoId}`;
+            const max = dmMaxHeight();
+            const maxQ = max && max < 4320 ? `&max=${max}` : '';
             res.setHeader('Cache-Control', 'no-store');
-            res.redirect(302, `${base}/dm/fetch?u=${encodeURIComponent(target)}&b=${encodeURIComponent(base)}`);
+            res.redirect(302, `${base}/dm/fetch?u=${encodeURIComponent(target)}${maxQ}&b=${encodeURIComponent(base)}`);
             return;
         }
         const metadataUrl = new URL(`https://www.dailymotion.com/player/metadata/video/${videoId}`);

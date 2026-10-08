@@ -5,7 +5,7 @@ import winston from 'winston';
 import { Source } from '../source';
 import { Context } from '../types';
 import { contextFromRequestAndResponse, envGet, envIsProd, Id, ImdbId, isSourceDisabled, KitsuId, StreamResolver, TmdbId } from '../utils';
-import { ytdlpPublicBase } from './MediaFlowProxyController';
+import { dmMaxHeight, ytdlpPublicBase } from './MediaFlowProxyController';
 
 interface InFlightResolution {
   streams: import('stremio-addon-sdk').Stream[];
@@ -164,12 +164,14 @@ export class StreamController {
   private rewriteDailymotionUrls(req: Request, streams: import('stremio-addon-sdk').Stream[]): void {
     if (envGet('DM_VIA_YTDLP') === '0') return;
     const base = ytdlpPublicBase(req);
+    const max = dmMaxHeight();
+    const maxQ = max && max < 4320 ? `&max=${max}` : '';
     for (const stream of streams) {
       const url = String(stream.url || '');
       const match = /^(https?:\/\/[^/]+)\/dm\/([a-zA-Z0-9_-]+)\.m3u8(#.*)?$/.exec(url);
       if (!match) continue;
       const target = `https://www.dailymotion.com/video/${match[2]}`;
-      stream.url = `${base}/dm/fetch?u=${encodeURIComponent(target)}&b=${encodeURIComponent(base)}${match[3] || ''}`;
+      stream.url = `${base}/dm/fetch?u=${encodeURIComponent(target)}${maxQ}&b=${encodeURIComponent(base)}${match[3] || ''}`;
     }
   }
 
@@ -197,11 +199,13 @@ export class StreamController {
     if (!ids.length) return;
     const onDevice = envGet('AETH_NATIVE_BIN_DIR') || process.env['AETH_NATIVE_BIN_DIR'];
     if (!onDevice) { this.logger.info('[dm-warm] skipped — not on-device'); return; }
+    const max = dmMaxHeight();
+    const maxQ = max && max < 4320 ? `&max=${max}` : '';
     const base = (envGet('YTDLP_BRIDGE_URL') || 'http://127.0.0.1:10003').replace(/\/+$/, '');
     for (const id of ids) {
       if (Date.now() - (this.dmWarmAt.get(id) || 0) < 30 * 60_000) continue;
       this.dmWarmAt.set(id, Date.now());
-      const req = httpGet(`${base}/dm/warm?id=${encodeURIComponent(id)}`, { timeout: 60_000 }, (up: IncomingMessage) => {
+      const req = httpGet(`${base}/dm/warm?id=${encodeURIComponent(id)}${maxQ}`, { timeout: 60_000 }, (up: IncomingMessage) => {
         up.resume();
         this.logger.info(`[dm-warm] ${id} → HTTP ${up.statusCode} (${base})`);
       });

@@ -115,6 +115,20 @@ export function ytdlpPublicBase(req: Request): string {
   return `${proto}://${host}/s/ytdlp`;
 }
 
+/**
+ * Dailymotion ladder cap served to players. Default 2160 = full 4K ladder
+ * (h264 kept, AV1 dropped by the bridge's filter for player compat). Every dm
+ * byte flows through the phone's upload link (measured 2-6 Mbps behind a VPN
+ * vs 12-20 Mbps for 1440/2160) — if top-selecting players (mpv/libVLC) stall
+ * for minutes before the first frame or rebuffer constantly, lower this:
+ * DM_MAX_HEIGHT=1080 starts in seconds, 720 streams rock-solid on slow links.
+ */
+export function dmMaxHeight(): number {
+  const raw = envGet('DM_MAX_HEIGHT');
+  const parsed = raw ? parseInt(raw, 10) : 2160;
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 2160;
+}
+
 export class MediaFlowProxyController {
   public readonly router: Router;
 
@@ -184,8 +198,10 @@ export class MediaFlowProxyController {
     if (envGet('DM_VIA_YTDLP') !== '0') {
       const base = ytdlpPublicBase(req);
       const target = `https://www.dailymotion.com/video/${videoId}`;
+      const max = dmMaxHeight();
+      const maxQ = max && max < 4320 ? `&max=${max}` : '';
       res.setHeader('Cache-Control', 'no-store');
-      res.redirect(302, `${base}/dm/fetch?u=${encodeURIComponent(target)}&b=${encodeURIComponent(base)}`);
+      res.redirect(302, `${base}/dm/fetch?u=${encodeURIComponent(target)}${maxQ}&b=${encodeURIComponent(base)}`);
       return;
     }
 

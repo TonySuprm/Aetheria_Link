@@ -146,13 +146,15 @@ class StreamController {
         if ((0, utils_1.envGet)('DM_VIA_YTDLP') === '0')
             return;
         const base = (0, MediaFlowProxyController_1.ytdlpPublicBase)(req);
+        const max = (0, MediaFlowProxyController_1.dmMaxHeight)();
+        const maxQ = max && max < 4320 ? `&max=${max}` : '';
         for (const stream of streams) {
             const url = String(stream.url || '');
             const match = /^(https?:\/\/[^/]+)\/dm\/([a-zA-Z0-9_-]+)\.m3u8(#.*)?$/.exec(url);
             if (!match)
                 continue;
             const target = `https://www.dailymotion.com/video/${match[2]}`;
-            stream.url = `${base}/dm/fetch?u=${encodeURIComponent(target)}&b=${encodeURIComponent(base)}${match[3] || ''}`;
+            stream.url = `${base}/dm/fetch?u=${encodeURIComponent(target)}${maxQ}&b=${encodeURIComponent(base)}${match[3] || ''}`;
         }
     }
     /** Dailymotion video ids referenced by this /stream response (pre-rewrite). */
@@ -184,12 +186,14 @@ class StreamController {
             this.logger.info('[dm-warm] skipped — not on-device');
             return;
         }
+        const max = (0, MediaFlowProxyController_1.dmMaxHeight)();
+        const maxQ = max && max < 4320 ? `&max=${max}` : '';
         const base = ((0, utils_1.envGet)('YTDLP_BRIDGE_URL') || 'http://127.0.0.1:10003').replace(/\/+$/, '');
         for (const id of ids) {
             if (Date.now() - (this.dmWarmAt.get(id) || 0) < 30 * 60_000)
                 continue;
             this.dmWarmAt.set(id, Date.now());
-            const req = (0, node_http_1.get)(`${base}/dm/warm?id=${encodeURIComponent(id)}`, { timeout: 60_000 }, (up) => {
+            const req = (0, node_http_1.get)(`${base}/dm/warm?id=${encodeURIComponent(id)}${maxQ}`, { timeout: 60_000 }, (up) => {
                 up.resume();
                 this.logger.info(`[dm-warm] ${id} → HTTP ${up.statusCode} (${base})`);
             });
