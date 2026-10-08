@@ -166,12 +166,16 @@ export class StreamController {
     const base = ytdlpPublicBase(req);
     const max = dmMaxHeight();
     const maxQ = max && max < 4320 ? `&max=${max}` : '';
+    // flat=1: serve the top variant's MEDIA playlist, not the master — serial
+    // players (mpv/libVLC) open every master rendition (16-40 tunnel round
+    // trips); a flat playlist needs playlist → init → segments only
+    const flatQ = envGet('DM_FLAT') === '0' ? '' : '&flat=1';
     for (const stream of streams) {
       const url = String(stream.url || '');
       const match = /^(https?:\/\/[^/]+)\/dm\/([a-zA-Z0-9_-]+)\.m3u8(#.*)?$/.exec(url);
       if (!match) continue;
       const target = `https://www.dailymotion.com/video/${match[2]}`;
-      stream.url = `${base}/dm/fetch?u=${encodeURIComponent(target)}${maxQ}&b=${encodeURIComponent(base)}${match[3] || ''}`;
+      stream.url = `${base}/dm/fetch?u=${encodeURIComponent(target)}${maxQ}${flatQ}&b=${encodeURIComponent(base)}${match[3] || ''}`;
     }
   }
 

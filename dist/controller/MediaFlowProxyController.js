@@ -195,8 +195,9 @@ class MediaFlowProxyController {
             const target = `https://www.dailymotion.com/video/${videoId}`;
             const max = dmMaxHeight();
             const maxQ = max && max < 4320 ? `&max=${max}` : '';
+            const flatQ = (0, utils_1.envGet)('DM_FLAT') === '0' ? '' : '&flat=1';
             res.setHeader('Cache-Control', 'no-store');
-            res.redirect(302, `${base}/dm/fetch?u=${encodeURIComponent(target)}${maxQ}&b=${encodeURIComponent(base)}`);
+            res.redirect(302, `${base}/dm/fetch?u=${encodeURIComponent(target)}${maxQ}${flatQ}&b=${encodeURIComponent(base)}`);
             return;
         }
         const metadataUrl = new URL(`https://www.dailymotion.com/player/metadata/video/${videoId}`);
